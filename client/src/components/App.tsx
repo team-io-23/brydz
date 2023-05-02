@@ -4,6 +4,8 @@ import Room from './Room/Room';
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import io from 'socket.io-client';
+import { SERVER } from '../config';
 
 function App() {
   const theme = createTheme();
@@ -24,3 +26,8 @@ function App() {
 }
 
 export default App;
+
+export const socket = io(SERVER);
+socket.on("connect", () => {
+  console.log("Connected to server");
+});

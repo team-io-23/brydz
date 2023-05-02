@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import './StartPage.css';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import { socket } from '../App';
 
 function StartPage() {
     const [nickname, setNickname] = useState<string>("");
@@ -27,6 +28,7 @@ function StartPage() {
     function JoinButton() {
         function handleJoin(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
             localStorage.setItem("nickname", nickname);
+            socket.emit("joined-room", nickname);
             navigate("/room");
         }
     
