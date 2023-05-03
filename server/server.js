@@ -40,6 +40,11 @@ io.on('connection', function (socket) {
         socket.leave(roomID);
         rooms.set(roomID, rooms.get(roomID).filter(function (id) { return id !== socket.id; })); // Remove player from room.
         playerRooms.delete(socket.id);
-        io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
+        io.in(roomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
+    });
+    socket.on('start-game', function () {
+        var roomID = playerRooms.get(socket.id);
+        console.log('starting game in room ' + roomID);
+        io.in(roomID).emit('started-game'); // TODO
     });
 });

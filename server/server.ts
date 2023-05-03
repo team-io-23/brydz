@@ -52,6 +52,12 @@ io.on('connection', socket => {
         rooms.set(roomID, rooms.get(roomID)!.filter(id => id !== socket.id)); // Remove player from room.
         playerRooms.delete(socket.id);
 
-        io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID)!.map(id => nicknames.get(id)));
+        io.in(roomID).emit('player-change', rooms.get(currentRoomID)!.map(id => nicknames.get(id)));
+    });
+
+
+    socket.on('start-game', () => {
+        const roomID = playerRooms.get(socket.id);
+        io.in(roomID).emit('started-game');
     });
 });
