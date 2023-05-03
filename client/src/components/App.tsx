@@ -8,7 +8,7 @@ import io from 'socket.io-client';
 import { SERVER } from '../config';
 
 function App() {
-  const theme = createTheme();
+  const theme = createTheme(); // TODO: Add custom theme
   return (
     <CssBaseline>
       <ThemeProvider theme={theme}>
