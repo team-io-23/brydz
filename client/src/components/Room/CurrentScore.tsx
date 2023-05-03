@@ -5,14 +5,20 @@ interface Props {
 }
 
 const CurrentScore: React.FC<Props> = ({ score }) => {
+    console.log(localStorage.getItem("players"));
+    let players = localStorage.getItem("players")!.split(",");
+    if (players.length !== 4) {
+        players = ["Player 1", "Player 2", "Player 3", "Player 4"]; // TODO: testing purposes
+    }
+
     return (
-        <div className="info-box">
+        <div className="info-box left">
             <div className="top-players">
                 <div className="player">
-                    Player 1
+                    {players[0]}
                 </div>
                 <div className="player">
-                    Player 2
+                    {players[2]}
                 </div>
             </div>
             <div className="score-box">
@@ -26,10 +32,10 @@ const CurrentScore: React.FC<Props> = ({ score }) => {
             </div>
             <div className="top-players">
                 <div className="player">
-                    Player 3
+                    {players[1]}
                 </div>
                 <div className="player">
-                    Player 4
+                    {players[3]}
                 </div>
             </div>
 

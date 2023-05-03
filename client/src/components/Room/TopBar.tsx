@@ -7,12 +7,12 @@ function getCurrentScore(): [number, number] {
 
 function TopBar() {
     const score: [number, number] = getCurrentScore();
-    const card: [string, string] = ["Ace", "Diamonds"];
+    const contract: [string, string] = ["3", "♦"];
 
     return (
         <div className="top-container">
             <CurrentScore score={score} />
-            <CurrentContract card={card} />
+            <CurrentContract contract={contract} />
         </div>
     )
 }
