@@ -1,0 +1,33 @@
+.top-container {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.info-box {
+    display: flex;
+    flex-direction: row;
+    background-color: #0A66C2;
+    border-radius: 30px;
+    padding: 10px;
+
+    margin: auto;
+}
+
+.score-box {
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+}
+
+.top-players {
+    padding: 0 10px;
+}

@@ -1,12 +1,15 @@
 import HandView from "./HandView";
 import { GetSelectedCardButton } from "./HandView";
-import CurrentScore from "./CurrentScore";
+import TopBar from "./TopBar";
 function Room() {
+
+
     return (
         <div>
             <h1>Room</h1>
-            <CurrentScore score={0} />
+
             <GetSelectedCardButton />
+            <TopBar />
             <HandView />
         </div>
     )
