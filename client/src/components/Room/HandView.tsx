@@ -1,18 +1,18 @@
 import './cards.css';
 function HandView() {
-    var playerHand: [string, string][] = [["A", "♣"], ["K", "♠"], ["Q", "♥"], ["J", "♦"], ["10", "♣"], ["9", "♠"], ["8", "♥"], ["7", "♦"], ["6", "♣"], ["5", "♠"], ["4", "♥"], ["3", "♦"], ["2", "♣"]];
+    var playerHand: [string, string, string][] = [["a", "clubs", "♣"], ["k", "spades", "♠"], ["q", "hearts", "♥"], ["j", "diams", "♦"], ["10", "clubs", "♣"], ["9", "spades", "♠"], ["8", "hearts", "♥"], ["7", "diams", "♦"], ["6", "clubs", "♣"], ["5", "spades", "♠"], ["4", "hearts", "♥"], ["3", "diams", "♦"], ["2", "clubs", "♣"]];
     return (
-        <div className='hand'>
-            {playerHand.map((card, index) => (
-                <div className='playing-card'>
-                    <input id={`card-${index}`} type='checkbox' />
-                    <label htmlFor={`card-${index}`} className={card[1]}>
-                        <div className='card-front' data-card={`${card[0]}${card[1]}`}>
-                            <span>{card[1]}</span>
-                        </div>
-                    </label>
-                </div>
-            ))}
+        <div className="playingCards faceImages">
+            <ul className="table">
+                {playerHand.map(([card, suit, symbol], index) => (
+                    <li>
+                        <a className={`card rank-${card} ${suit}`}>
+                            <span className="rank">{card.toUpperCase()}</span>
+                            <span className="suit">{symbol}</span>
+                        </a>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }
