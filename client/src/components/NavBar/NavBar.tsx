@@ -65,6 +65,7 @@ function BasicMenu(props: Menu_t) {
   }
 
 const pages = new Map<string, Array<MenuOption_t>>();
+// TODO
 pages.set('Play', [{name: 'Random game', link: '/Room'}, {name: 'Go to room', link: '/'}]);
 
 function NavBar() {
