@@ -14,18 +14,18 @@ function StartPage() {
     function NicknameInputField() {
         return (
             <div className='StartPage-NicknameInputFieldWrapper'>
-            <TextField
-                autoFocus
-                label="Join as"
-                type="text"
-                className='StartPage-NicknameInputField'
-                value = {nickname}
-                onChange = {(event: ChangeEvent<HTMLInputElement>) => setNickname(event.target.value)}
-            />
+                <TextField
+                    autoFocus
+                    label="Join as"
+                    type="text"
+                    className='StartPage-NicknameInputField'
+                    value={nickname}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) => setNickname(event.target.value)}
+                />
             </div>
         );
     }
-    
+
     function JoinButton() {
         function handleJoin(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
             localStorage.setItem("nickname", nickname);
@@ -36,12 +36,12 @@ function StartPage() {
                 navigate("/room");
             });
         }
-    
+
         return (
             <Button
-                variant = "contained"
-                onClick = {handleJoin}
-                className = 'StartPage-JoinButton'
+                variant="contained"
+                onClick={handleJoin}
+                className='StartPage-JoinButton'
             >
                 Join
             </Button>
@@ -52,8 +52,8 @@ function StartPage() {
         <div className='StartPage'>
             <NavBar/>
             <div className='StartPage-Input'>
-                <NicknameInputField/>
-                <JoinButton/>
+                <NicknameInputField />
+                <JoinButton />
             </div>
         </div>
     );
