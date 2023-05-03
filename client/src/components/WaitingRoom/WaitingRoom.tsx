@@ -25,12 +25,12 @@ function WaitingRoom() {
 
     function handleStart() {
         console.log(playersInRoom);
-        if (playersInRoom.length !== 2) {
+        /*if (playersInRoom.length !== 2) {
             alert("You need 4 players to start a game");
             return;
         }
 
-        /*if (playersInRoom[0] != localStorage.getItem("nickname")) {
+        if (playersInRoom[0] != localStorage.getItem("nickname")) {
             alert("Only the host can start the game");
             return;
         }*/ // TODO - testing purposes. Remove comment later.
