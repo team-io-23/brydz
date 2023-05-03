@@ -36,12 +36,22 @@ io.on('connection', socket => {
         console.log(rooms.get(currentRoomID));
         socket.emit('joined-room', currentRoomID);
         
-        // Informing players of new player.
-        io.in(currentRoomID).emit('new-player', rooms.get(currentRoomID)!.map(id => nicknames.get(id)));
+        // Informing players of change.
+        io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID)!.map(id => nicknames.get(id)));
     });
 
 
     socket.on('leaving-room', () => {
-        console.log('leaving-room');
+        const roomID = playerRooms.get(socket.id);
+        if (roomID === undefined) {
+            return;
+        }
+
+        // Leaving room.
+        socket.leave(roomID);
+        rooms.set(roomID, rooms.get(roomID)!.filter(id => id !== socket.id)); // Remove player from room.
+        playerRooms.delete(socket.id);
+
+        io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID)!.map(id => nicknames.get(id)));
     });
 });
