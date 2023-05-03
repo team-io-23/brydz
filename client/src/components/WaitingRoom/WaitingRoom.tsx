@@ -13,6 +13,7 @@ function WaitingRoom() {
 
     socket.on("started-game", () => {
         console.log("Started game");
+        localStorage.setItem("players", playersInRoom.toString());
         navigate("/room");
     });
 
@@ -24,7 +25,7 @@ function WaitingRoom() {
 
     function handleStart() {
         console.log(playersInRoom);
-        if (playersInRoom.length != 4) {
+        if (playersInRoom.length !== 2) {
             alert("You need 4 players to start a game");
             return;
         }

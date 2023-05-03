@@ -44,7 +44,6 @@ io.on('connection', function (socket) {
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
-        console.log('starting game in room ' + roomID);
-        io.in(roomID).emit('started-game'); // TODO
+        io.in(roomID).emit('started-game');
     });
 });

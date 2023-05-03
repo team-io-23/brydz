@@ -2,14 +2,18 @@ import './TopBar.css';
 import React from "react";
 
 interface Props {
-    card: [string, string];
+    contract: [string, string];
 }
 
 
-const CurrentContract: React.FC<Props> = ({ card }) => {
+const CurrentContract: React.FC<Props> = ({ contract }) => {
+    // TODO - coloring of suit
     return (
-        <div className="info-box">
-            {card[0]} of {card[1]}
+        <div className="info-box right">
+            Contract: 
+            <div className="contract-box">
+                {contract[0]} {contract[1]}
+            </div>
         </div>
     )
 }
