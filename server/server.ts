@@ -60,4 +60,11 @@ io.on('connection', socket => {
         const roomID = playerRooms.get(socket.id);
         io.in(roomID).emit('started-game');
     });
+
+
+    socket.on('play-card', (cardRank: string, cardSuit: string) => {
+        console.log(socket.id + ' played ' + cardRank + ' of ' + cardSuit);
+        const roomID = playerRooms.get(socket.id);
+        io.in(roomID).emit('played-card', cardRank, cardSuit);
+    });
 });
