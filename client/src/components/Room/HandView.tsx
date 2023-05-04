@@ -25,9 +25,10 @@ function HandView() {
 
     let [hand, setHand] = useState<Array<Card>>(playerHand);
 
-    socket.on("card-played", (card: Card, currentSuit: string) => {
+    socket.on("card-played", (card: Card, currentSuit: string, playedBy: number) => {
+        // TODO: Do stuff when someone plays a card.
         console.log("Current suit: " + currentSuit);
-        console.log("Someone played card: " + card.rank + " of " + card.suit);
+        console.log("Player number " + playedBy + " played card: " + card.rank + " of " + card.suit);
         localStorage.setItem("suit", currentSuit);
     });
 

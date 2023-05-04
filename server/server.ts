@@ -126,6 +126,7 @@ io.on('connection', socket => {
     socket.on('play-card', (card: Card) => {
         console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
         const roomID = playerRooms.get(socket.id)!;
+        const playerIndex = rooms.get(roomID)!.indexOf(socket.id);
 
         currentTricks.get(roomID)!.push(card);
         if (currentTricks.get(roomID)!.length === 4) {
@@ -143,7 +144,7 @@ io.on('connection', socket => {
         const currentTurn = (currentTurns.get(roomID)! + 1) % 4;
         currentTurns.set(roomID, currentTurn);
 
-        io.in(roomID).emit('card-played', card, currentSuit);
+        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
         io.in(rooms.get(roomID)![currentTurn]).emit('your-turn');
 
     });

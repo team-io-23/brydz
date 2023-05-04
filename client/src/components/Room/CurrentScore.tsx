@@ -1,10 +1,8 @@
 import React from "react";
 import './TopBar.css';
-interface Props {
-    score: [number, number];
-}
+import { Result } from "./Room";
 
-const CurrentScore: React.FC<Props> = ({ score }) => {
+const CurrentScore: React.FC<Result> = ({ teamOne, teamTwo }) => {
     console.log(localStorage.getItem("players"));
     let players = localStorage.getItem("players")!.split(",");
     if (players.length !== 4) {
@@ -23,11 +21,11 @@ const CurrentScore: React.FC<Props> = ({ score }) => {
             </div>
             <div className="score-box">
                 <div>
-                    {score[0]}
+                    {teamOne}
                 </div>
                 :
                 <div>
-                    {score[1]}
+                    {teamTwo}
                 </div>
             </div>
             <div className="top-players">
