@@ -1,4 +1,5 @@
 import { HandView, NorthHandView, WestHandView, EastHandView } from "./HandView";
+import Table from "./Table";
 import TopBar from "./TopBar";
 import { socket } from "../App";
 import { Card } from "../../utils";
@@ -41,11 +42,12 @@ function Room() {
     });
 
     return (
-        <div>
+        <div style={{ height: "300px" }}>
             <TopBar teamOne={result.teamOne} teamTwo={result.teamTwo} />
             <NorthHandView />
             <WestHandView />
             <EastHandView />
+            <Table />
             <HandView />
         </div>
     )
