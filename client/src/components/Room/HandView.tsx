@@ -1,33 +1,62 @@
 import './cards.css';
 import './buttons.css';
-
+import React, { useState } from 'react';
+import { Card, checkCorrectCard } from '../../utils';
+import { socket } from '../App';
 var selectedCard: [string, string, string];
 
 function HandView() {
-    var playerHand: [string, string, string][] = [["a", "clubs", "♣"], ["k", "spades", "♠"], ["q", "hearts", "♥"], ["j", "diams", "♦"], ["10", "clubs", "♣"], ["9", "spades", "♠"], ["8", "hearts", "♥"], ["7", "diams", "♦"], ["6", "clubs", "♣"], ["5", "spades", "♠"], ["4", "hearts", "♥"], ["3", "diams", "♦"], ["2", "clubs", "♣"]];
+    // TODO: Replace this with the actual hand.
+    var playerHand: Array<Card> = [
+        {rank: "a", suit: "clubs", symbol: "♣"},
+        {rank: "k", suit: "spades", symbol: "♠"},
+        {rank: "q", suit: "hearts", symbol: "♥"},
+        {rank: "j", suit: "diams", symbol: "♦"},
+        {rank: "10", suit: "clubs", symbol: "♣"},
+        {rank: "9", suit: "spades", symbol: "♠"},
+        {rank: "8", suit: "hearts", symbol: "♥"},
+        {rank: "7", suit: "diams", symbol: "♦"},
+        {rank: "6", suit: "clubs", symbol: "♣"},
+        {rank: "5", suit: "spades", symbol: "♠"},
+        {rank: "4", suit: "hearts", symbol: "♥"},
+        {rank: "3", suit: "diams", symbol: "♦"},
+        {rank: "2", suit: "clubs", symbol: "♣"},
+    ];
 
-    function selectCard(event: React.MouseEvent<HTMLLIElement, MouseEvent>) {
-        var myCards = document.getElementsByClassName("myAllCards");
-        for (var i = 0; i < myCards.length; i++) {
-            if (myCards[i].classList.contains("selected")) {
-                myCards[i].classList.remove("selected");
-            }
+    let [hand, setHand] = useState<Array<Card>>(playerHand);
+
+    function playCard(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+        let card = event.currentTarget.className;
+        let cardRank = card.split(" ")[1].split("-")[1];
+        let cardSuit = card.split(" ")[2];
+        let turn = localStorage.getItem("turn") === "true";
+        let currentSuit = localStorage.getItem("suit")!;
+
+        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) {
+            console.log("Illegal card! / Not your turn!");
+            return;
         }
-        var card = document.getElementById(event.currentTarget.id + "card");
-        card?.classList.add("selected");
-        selectedCard = playerHand[parseInt(event.currentTarget.id)];
-        console.log(selectedCard);
 
+        if (currentSuit === "") {
+            localStorage.setItem("suit", cardSuit);
+        }
+
+        // Symbol is not needed here, we can just keep it empty.
+        socket.emit("play-card", {rank: cardRank, suit: cardSuit, symbol: ""});
+        console.log("Played " + cardRank + " of " + cardSuit);
+        // Remove card from hand
+        setHand(hand.filter((card) => card.rank !== cardRank || card.suit !== cardSuit));
+        localStorage.setItem("turn", "false");
     }
 
     return (
         <div className="myHand">
             <div className="playingCards faceImages">
                 <ul className="table">
-                    {playerHand.map(([card, suit, symbol], index) => (
-                        <li key={index} onClick={selectCard} id={index.toString()}>
-                            <a className={`card rank-${card} ${suit} myAllCards`} id={index + "card"}>
-                                <span className="rank">{card.toUpperCase()}</span>
+                    {hand.map(({rank, suit, symbol}) => (
+                        <li>
+                            <a className={`card rank-${rank} ${suit} myAllCards`} onClick={playCard}>
+                                <span className="rank">{rank.toUpperCase()}</span>
                                 <span className="suit">{symbol}</span>
                             </a>
                         </li>
@@ -38,14 +67,4 @@ function HandView() {
     );
 }
 
-function GetSelectedCardButton() {
-    function getSelectedCard() {
-        console.log(selectedCard);
-    }
-    return (
-        <button className='basicButton' onClick={getSelectedCard}>Get Selected Card</button>
-    );
-}
-
 export default HandView;
-export { GetSelectedCardButton };

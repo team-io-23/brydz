@@ -1,17 +1,14 @@
 import CurrentScore from "./CurrentScore";
 import CurrentContract from "./CurrentContract";
 import './TopBar.css'
-function getCurrentScore(): [number, number] {
-    return [1, 3];
-}
+import { Result } from "./Room";
 
-function TopBar() {
-    const score: [number, number] = getCurrentScore();
+function TopBar(result: Result) {
     const contract: [string, string] = ["3", "♦"];
 
     return (
         <div className="top-container">
-            <CurrentScore score={score} />
+            <CurrentScore teamOne={result.teamOne} teamTwo={result.teamTwo} />
             <CurrentContract contract={contract} />
         </div>
     )
