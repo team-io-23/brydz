@@ -23,27 +23,36 @@ function HandView() {
         {rank: "2", suit: "clubs", symbol: "♣"},
     ];
 
-    let [currentSuit, setCurrentSuit] = useState<string>("");
     let [hand, setHand] = useState<Array<Card>>(playerHand);
+
+    socket.on("card-played", (card: Card, currentSuit: string) => {
+        console.log("Current suit: " + currentSuit);
+        console.log("Someone played card: " + card.rank + " of " + card.suit);
+        localStorage.setItem("suit", currentSuit);
+    });
 
     function playCard(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
         let card = event.currentTarget.className;
         let cardRank = card.split(" ")[1].split("-")[1];
         let cardSuit = card.split(" ")[2];
+        let turn = localStorage.getItem("turn") === "true";
+        let currentSuit = localStorage.getItem("suit")!;
 
-        if (!checkCorrectCard(hand, cardSuit, currentSuit)) {
-            console.log("Illegal card!");
+        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) {
+            console.log("Illegal card! / Not your turn!");
             return;
         }
 
         if (currentSuit === "") {
-            setCurrentSuit(cardSuit);
+            localStorage.setItem("suit", cardSuit);
         }
 
-        socket.emit("play-card", cardRank, cardSuit);
+        // Symbol is not needed here, we can just keep it empty.
+        socket.emit("play-card", {rank: cardRank, suit: cardSuit, symbol: ""});
         console.log("Played " + cardRank + " of " + cardSuit);
         // Remove card from hand
         setHand(hand.filter((card) => card.rank !== cardRank || card.suit !== cardSuit));
+        localStorage.setItem("turn", "false");
     }
 
     return (
@@ -64,14 +73,4 @@ function HandView() {
     );
 }
 
-function GetSelectedCardButton() {
-    function getSelectedCard() {
-        console.log(selectedCard);
-    }
-    return (
-        <button className='basicButton' onClick={getSelectedCard}>Get Selected Card</button>
-    );
-}
-
 export default HandView;
-export { GetSelectedCardButton };

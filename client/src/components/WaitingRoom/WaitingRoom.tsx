@@ -14,6 +14,7 @@ function WaitingRoom() {
     socket.on("started-game", () => {
         console.log("Started game");
         localStorage.setItem("players", playersInRoom.toString());
+        localStorage.setItem("seat", playersInRoom.indexOf(localStorage.getItem("nickname")!).toString());
         navigate("/room");
     });
 
