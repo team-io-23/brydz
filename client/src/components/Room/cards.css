@@ -10,12 +10,37 @@
 /* card itself
 ********************************************************************/
 
-.myHand {
+.northHand {
+    position: absolute;
+    top: 0px;
+    margin-top: -15px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%)
+}
+
+.southHand {
     position: absolute;
     left: 50%;
     bottom: 0px;
     -webkit-transform: translateX(-50%);
     transform: translateX(-50%)
+}
+
+.westHand {
+    position: absolute;
+    left: 0px;
+    top: 60%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%)
+}
+
+.eastHand {
+    position: absolute;
+    right: 0px;
+    top: 60%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
 }
 
 .playingCards .selected {
@@ -46,16 +71,26 @@
     margin-left: -40px;
 }
 
+.westHand .card {
+    margin-left: 10px;
+    margin-top: -100px;
+}
+
+.eastHand .card {
+    margin-top: -100px;
+    margin-right: 10px;
+}
+
 .playingCards a.card {
     text-decoration: none;
 }
 
 /* selected and hover state */
-.playingCards a.card:hover,
-.playingCards a.card:active,
-.playingCards a.card:focus,
-.playingCards label.card:hover,
-.playingCards strong .card {
+.southHand a.card:hover,
+.southHand a.card:active,
+.southHand a.card:focus,
+.southHand label.card:hover,
+.southHand strong .card {
     bottom: 1em;
 }
 
@@ -605,6 +640,19 @@
     list-style-type: none;
     float: left;
 }
+
+.eastHand ul.table li,
+.eastHand ul.hand li,
+.eastHand ul.deck li,
+.westHand ul.table li,
+.westHand ul.hand li,
+.westHand ul.deck li {
+    margin: 0;
+    padding: 0;
+    float: none;
+    position: relative;
+}
+
 
 .playingCards ul.hand,
 .playingCards ul.deck {

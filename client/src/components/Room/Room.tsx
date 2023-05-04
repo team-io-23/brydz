@@ -1,4 +1,4 @@
-import HandView from "./HandView";
+import { HandView, NorthHandView, WestHandView, EastHandView } from "./HandView";
 import TopBar from "./TopBar";
 import { socket } from "../App";
 import { Card } from "../../utils";
@@ -11,7 +11,7 @@ export interface Result {
 }
 
 function Room() {
-    let [result, setResult] = useState<Result>({teamOne: 0, teamTwo: 0});
+    let [result, setResult] = useState<Result>({ teamOne: 0, teamTwo: 0 });
 
     socket.on("your-turn", () => {
         console.log("It's your turn!");
@@ -25,10 +25,10 @@ function Room() {
 
         // Updating score.
         if (winner === 0 || winner === 2) {
-            setResult({teamOne: result.teamOne + 1, teamTwo: result.teamTwo});
+            setResult({ teamOne: result.teamOne + 1, teamTwo: result.teamTwo });
         }
         else {
-            setResult({teamOne: result.teamOne, teamTwo: result.teamTwo + 1});
+            setResult({ teamOne: result.teamOne, teamTwo: result.teamTwo + 1 });
         }
 
     });
@@ -43,6 +43,9 @@ function Room() {
     return (
         <div>
             <TopBar teamOne={result.teamOne} teamTwo={result.teamTwo} />
+            <NorthHandView />
+            <WestHandView />
+            <EastHandView />
             <HandView />
         </div>
     )
