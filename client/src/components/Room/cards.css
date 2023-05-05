@@ -112,6 +112,7 @@
 .eastHand .card {
     margin-top: -100px;
     margin-right: 10px;
+    rotate: 270deg;
 }
 
 .playingCards a.card {

@@ -38,7 +38,7 @@ function Room() {
 
 
     return (
-        <div style={{ height: "300px" }}>
+        <div>
             <TopBar teamOne={result.teamOne} teamTwo={result.teamTwo} />
             <NorthHandView />
             <WestHandView />
