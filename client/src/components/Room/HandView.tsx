@@ -22,6 +22,13 @@ function HandView() {
         { rank: "2", suit: "clubs", symbol: "♣" },
     ];
 
+    const symbols: { [key: string]: string } = {
+        "clubs": "♣",
+        "spades": "♠",
+        "hearts": "♥",
+        "diams": "♦",
+    };
+
     let [hand, setHand] = useState<Array<Card>>(playerHand);
 
     function playCard(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
@@ -31,7 +38,7 @@ function HandView() {
         let turn = localStorage.getItem(`turn-${socket.id}`) === "true";
         let currentSuit = localStorage.getItem(`suit-${socket.id}`)!;
 
-        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) { // TODO upsi dupsi naprawić iffa
+        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) {
             console.log("Illegal card! / Not your turn!");
             console.log("Turn", turn);
             console.log(checkCorrectCard(hand, cardSuit, currentSuit));
@@ -43,7 +50,7 @@ function HandView() {
         }
 
         // Symbol is not needed here, we can just keep it empty.
-        socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: "" });
+        socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: symbols[cardSuit] });
         console.log("Played " + cardRank + " of " + cardSuit);
         // Remove card from hand
         setHand(hand.filter((card) => card.rank !== cardRank || card.suit !== cardSuit));
@@ -55,7 +62,7 @@ function HandView() {
             <div className="playingCards faceImages">
                 <ul className="table">
                     {hand.map(({ rank, suit, symbol }) => (
-                        <li>
+                        <li key={rank + suit}>
                             <a className={`card rank-${rank} ${suit} myAllCards`} onClick={playCard}>
                                 <span className="rank">{rank.toUpperCase()}</span>
                                 <span className="suit">{symbol}</span>
@@ -94,7 +101,7 @@ function NorthHandView() {
             <div className="playingCards faceImages">
                 <ul className="table">
                     {hand.map(({ rank, suit, symbol }) => (
-                        <li>
+                        <li key={rank + suit}>
                             <a className={'card back'}></a>
                         </li>
                     ))}
@@ -129,7 +136,7 @@ function WestHandView() {
             <div className="playingCards faceImages">
                 <ul className="table">
                     {hand.map(({ rank, suit, symbol }) => (
-                        <li>
+                        <li key={rank + suit}>
                             <a className={'card back'}></a>
                         </li>
                     ))}
@@ -164,7 +171,7 @@ function EastHandView() {
             <div className="playingCards faceImages">
                 <ul className="table">
                     {hand.map(({ rank, suit, symbol }) => (
-                        <li>
+                        <li key={rank + suit}>
                             <a className={'card back'}></a>
                         </li>
                     ))}

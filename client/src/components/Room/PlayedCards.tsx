@@ -20,7 +20,7 @@ function PlayedCards() {
     socket.on("card-played", (card: Card, currentSuit: string, playedBy: number) => {
         // TODO: Do stuff when someone plays a card.
         console.log("Current suit: " + currentSuit);
-        console.log("Player number " +    playedBy + " played card: " + card.rank + " of " + card.suit);
+        console.log("Player number " + playedBy + " played card: " + card.rank + " of " + card.suit);
         localStorage.setItem(`suit-${socket.id}`, currentSuit);
         localStorage.setItem(`playedBy-${socket.id}` + playedBy, JSON.stringify(card));
         playCard(card, playedBy);
@@ -32,7 +32,7 @@ function PlayedCards() {
             <div className="playingCards faceImages">
                 {Array.from(playedCards).map(([index, { rank, suit, symbol }]) => (
                     <ul className={`played-space-${index}`}>
-                        <li>
+                        <li key={rank + suit + symbol}>
                             <a className={`card rank-${rank} ${suit} myAllCards`}>
                                 <span className="rank">{rank.toUpperCase()}</span>
                                 <span className="suit">{symbol}</span>
