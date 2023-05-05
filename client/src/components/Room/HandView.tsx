@@ -28,18 +28,18 @@ function HandView() {
         let card = event.currentTarget.className;
         let cardRank = card.split(" ")[1].split("-")[1];
         let cardSuit = card.split(" ")[2];
-        let turn = localStorage.getItem("turn") === "true";
-        let currentSuit = localStorage.getItem("suit")!;
+        let turn = localStorage.getItem(`turn-${socket.id}`) === "true";
+        let currentSuit = localStorage.getItem(`suit-${socket.id}`)!;
 
-        // if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) { // TODO upsi dupsi naprawić iffa
-        //     console.log("Illegal card! / Not your turn!");
-        //     console.log("Turn", turn);
-        //     console.log(checkCorrectCard(hand, cardSuit, currentSuit));
-        //     return;
-        // }
+        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) { // TODO upsi dupsi naprawić iffa
+            console.log("Illegal card! / Not your turn!");
+            console.log("Turn", turn);
+            console.log(checkCorrectCard(hand, cardSuit, currentSuit));
+            return;
+        }
 
         if (currentSuit === "") {
-            localStorage.setItem("suit", cardSuit);
+            localStorage.setItem(`suit-${socket.id}`, cardSuit);
         }
 
         // Symbol is not needed here, we can just keep it empty.
@@ -47,7 +47,7 @@ function HandView() {
         console.log("Played " + cardRank + " of " + cardSuit);
         // Remove card from hand
         setHand(hand.filter((card) => card.rank !== cardRank || card.suit !== cardSuit));
-        localStorage.setItem("turn", "false");
+        localStorage.setItem(`turn-${socket.id}`, "false");
     }
 
     return (

@@ -18,13 +18,13 @@ function Room() {
 
     socket.on("your-turn", () => {
         console.log("It's your turn!");
-        localStorage.setItem("turn", "true");
+        localStorage.setItem(`turn-${socket.id}`, "true");
     });
 
     socket.on("trick-over", (winner: number) => {
         // TODO: Clear table when trick is over.
         console.log("Trick over! Winner: " + winner);
-        localStorage.setItem("suit", ""); // Reset current suit
+        localStorage.setItem(`suit-${socket.id}`, ""); // Reset current suit
 
         // Updating score.
         if (winner === 0 || winner === 2) {
