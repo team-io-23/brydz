@@ -13,13 +13,14 @@ function WaitingRoom() {
 
     socket.on("started-game", () => {
         console.log("Started game");
-        localStorage.setItem("players", playersInRoom.toString());
-        localStorage.setItem("seat", playersInRoom.indexOf(localStorage.getItem("nickname")!).toString());
+        let nickname = localStorage.getItem(`nickname-${socket.id}`)!;
+        localStorage.setItem(`players-${socket.id}`, playersInRoom.toString());
+        localStorage.setItem(`seat-${socket.id}`, playersInRoom.indexOf(nickname).toString());
         navigate("/room");
     });
 
     function handleLeave() {
-        socket.emit("leaving-room", localStorage.getItem("nickname"));
+        socket.emit("leaving-room", localStorage.getItem(`nickname-${socket.id}`));
         navigate('/');
     }
 
@@ -31,12 +32,12 @@ function WaitingRoom() {
             return;
         }
 
-        if (playersInRoom[0] != localStorage.getItem("nickname")) {
+        if (playersInRoom[0] != localStorage.getItem(`nickname-${socket.id}`)) {
             alert("Only the host can start the game");
             return;
         }*/ // TODO - testing purposes. Remove comment later.
 
-        socket.emit("start-game", localStorage.getItem("room"));
+        socket.emit("start-game", localStorage.getItem(`room-${socket.id}`));
     }
 
     // Testing HTML

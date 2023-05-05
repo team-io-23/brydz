@@ -43,15 +43,8 @@
     transform: translateY(-50%);
 }
 
+/* IMPORTANT: Order here was changed, because we need clockwise, not anticlockwise. */
 .played-space-0 {
-    position: absolute;
-    left: 40%;
-    top: 50%;
-    -webkit-transform: translateX(-50%) translateY(-50%);
-    transform: translateX(-50%) translateY(-50%);
-}
-
-.played-space-1 {
     position: absolute;
     left: 50%;
     top: 60%;
@@ -59,7 +52,23 @@
     transform: translateX(-50%) translateY(-50%);
 }
 
+.played-space-1 {
+    position: absolute;
+    left: 40%;
+    top: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
 .played-space-2 {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.played-space-3 {
     position: absolute;
     left: 60%;
     top: 50%;
@@ -67,13 +76,7 @@
     transform: translateX(-50%) translateY(-50%);
 }
 
-.played-space-3 {
-    position: absolute;
-    left: 50%;
-    top: 40%;
-    -webkit-transform: translateX(-50%) translateY(-50%);
-    transform: translateX(-50%) translateY(-50%);
-}
+
 
 .playingCards .selected {
     bottom: 1em;

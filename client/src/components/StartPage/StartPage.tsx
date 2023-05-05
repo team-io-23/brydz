@@ -28,12 +28,12 @@ function StartPage() {
 
     function JoinButton() {
         function handleJoin(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-            localStorage.setItem("nickname", nickname);
+            localStorage.setItem(`nickname-${socket.id}`, nickname);
 
             socket.emit("joining-room", nickname);
             socket.on("joined-room", (room: string) => {
-                localStorage.setItem("room", room);
-                console.log("Joined room: " + localStorage.getItem("room"));
+                localStorage.setItem(`room-${socket.id}`, room);
+                console.log("Joined room: " + localStorage.getItem(`room-${socket.id}`));
                 navigate("/waitingRoom");
             });
             
