@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import io from 'socket.io-client';
 import { SERVER } from '../config';
 import WaitingRoom from './WaitingRoom/WaitingRoom';
+import Bidding from './Bidding/Bidding';
 
 function App() {
   const theme = createTheme(); // TODO: Add custom theme
@@ -19,6 +20,7 @@ function App() {
             <Route path = "*"       element = {<StartPage/>}/>
             <Route path = "/room"   element = {<Room/>}/>
             <Route path = "/waitingRoom"   element = {<WaitingRoom/>}/>
+            <Route path = "/bidding"   element = {<Bidding/>}/>
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

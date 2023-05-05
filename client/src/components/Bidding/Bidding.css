@@ -1,0 +1,33 @@
+.button {
+    border: none;
+    color: black;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.button.clubs {
+    background-color: #4CAF50; /* Green */
+}
+
+
+.button.diams {
+    background-color: #ffbf00; /* Yellow */
+}
+
+
+.button.hearts {
+    background-color: #cc2727; /* Red */
+}
+
+
+.button.spades {
+    background-color: #2882b3; /* Blue */
+}
+
+
+.button.no-trumps {
+    background-color: #808080; /* Gray */
+}
