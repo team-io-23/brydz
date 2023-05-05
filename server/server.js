@@ -113,6 +113,8 @@ io.on('connection', function (socket) {
         var roomID = playerRooms.get(socket.id);
         var playerIndex = rooms.get(roomID).indexOf(socket.id);
         currentTricks.get(roomID).push(card);
+        var currentSuit = currentTricks.get(roomID)[0].suit;
+        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
         if (currentTricks.get(roomID).length === 4) {
             // Trick is over.
             var winnerIndex = getWinner(roomID);
@@ -122,10 +124,8 @@ io.on('connection', function (socket) {
             io.in(rooms.get(roomID)[winnerIndex]).emit('your-turn'); // Sending info to trick winner.
             return;
         }
-        var currentSuit = currentTricks.get(roomID)[0].suit;
         var currentTurn = (currentTurns.get(roomID) + 1) % 4;
         currentTurns.set(roomID, currentTurn);
-        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
         io.in(rooms.get(roomID)[currentTurn]).emit('your-turn');
     });
     socket.on('bid', function (bid) {

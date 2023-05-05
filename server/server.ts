@@ -154,6 +154,9 @@ io.on('connection', socket => {
         const playerIndex = rooms.get(roomID)!.indexOf(socket.id);
 
         currentTricks.get(roomID)!.push(card);
+        const currentSuit = currentTricks.get(roomID)![0].suit;
+        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
+
         if (currentTricks.get(roomID)!.length === 4) {
             // Trick is over.
             let winnerIndex = getWinner(roomID);
@@ -165,11 +168,8 @@ io.on('connection', socket => {
             return;
         }
 
-        const currentSuit = currentTricks.get(roomID)![0].suit;
         const currentTurn = (currentTurns.get(roomID)! + 1) % 4;
         currentTurns.set(roomID, currentTurn);
-
-        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
         io.in(rooms.get(roomID)![currentTurn]).emit('your-turn');
 
     });

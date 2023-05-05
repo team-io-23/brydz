@@ -1,6 +1,6 @@
 .table1 {
-    width: 1015px;
-    height: 415px;
+    width: 815px;
+    height: 615px;
     background-color: #4aad4a;
     position: absolute;
     top: 450px;
@@ -17,8 +17,8 @@
     content: '';
     border: 7px solid rgba(0, 0, 0, .1);
     display: block;
-    width: 1015px;
-    height: 415px;
+    width: 815px;
+    height: 615px;
     border-radius: 150px;
     position: absolute;
     top: -15px;
@@ -29,24 +29,10 @@
     content: '';
     border: 7px solid rgba(0, 0, 0, .1);
     display: block;
-    width: 985px;
-    height: 385px;
+    width: 785px;
+    height: 585px;
     border-radius: 130px;
     position: absolute;
     top: 0;
     left: 0;
 }
-
-/* .table1 {
-    width: 1000px;
-    height: 400px;
-    background-color: #4aad4a;
-    position: absolute;
-    top: 450px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-50%);
-    border-radius: 150px;
-    position: relative;
-    border: 15px solid #a95555;
-
-} */
