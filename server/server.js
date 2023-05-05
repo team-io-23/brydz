@@ -15,6 +15,8 @@ var currentRoomID = 12; // TODO - testing
 var currentTricks = new Map(); // roomID, played cards
 var currentTurns = new Map(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 var currentTrumps = new Map(); // roomID, trump suit
+// TODO - maybe save played cards but who cares
+
 function getWinner(roomID) {
     var trump = currentTrumps.get(roomID);
     var cards = currentTricks.get(roomID);
@@ -98,6 +100,7 @@ io.on('connection', function (socket) {
         var roomID = playerRooms.get(socket.id);
         var playerIndex = rooms.get(roomID).indexOf(socket.id);
         currentTricks.get(roomID).push(card);
+        io.in(roomID).emit('card-played', card, "heart", playerIndex);
         if (currentTricks.get(roomID).length === 4) {
             // Trick is over.
             var winnerIndex = getWinner(roomID);
@@ -110,7 +113,6 @@ io.on('connection', function (socket) {
         var currentSuit = currentTricks.get(roomID)[0].suit;
         var currentTurn = (currentTurns.get(roomID) + 1) % 4;
         currentTurns.set(roomID, currentTurn);
-        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
         io.in(rooms.get(roomID)[currentTurn]).emit('your-turn');
     });
 });
