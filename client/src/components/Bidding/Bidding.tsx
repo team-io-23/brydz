@@ -12,20 +12,20 @@ function Bidding () {
     socket.on("bid-made", (bid: Bid) => {
         // TODO - doubles and redoubles
         if (bid.value !== "pass") {
-            localStorage.setItem("bid", bid.value + " " + bid.trump);
+            localStorage.setItem(`bid-${socket.id}`, bid.value + " " + bid.trump);
         }
     });
 
     socket.on("bidding-over", () => {
-        localStorage.setItem("contract", localStorage.getItem("bid")!);
+        localStorage.setItem(`contract-${socket.id}`, localStorage.getItem(`bid-${socket.id}`)!);
         navigate("/room");
     });
 
     function handleBid(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        let turn = localStorage.getItem("turn") === "true";
+        let turn = localStorage.getItem(`turn-${socket.id}`) === "true";
 
         let bidString = event.currentTarget.className.split("button ")[1];
-        let currentBidString = localStorage.getItem("bid")!;
+        let currentBidString = localStorage.getItem(`bid-${socket.id}`)!;
 
         let bid = {value: bidString.split(" ")[0], trump: bidString.split(" ")[1]};
         let currentBid = {value: currentBidString.split(" ")[0], trump: currentBidString.split(" ")[1]};

@@ -32,7 +32,7 @@ function Room() {
     });
 
 
-    let contractString = localStorage.getItem("contract")!;
+    let contractString = localStorage.getItem(`contract-${socket.id}`)!;
     let contract = { value: contractString.split(" ")[0], trump: contractString.split(" ")[1] };
 
     return (
