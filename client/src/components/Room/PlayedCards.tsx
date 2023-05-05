@@ -12,6 +12,14 @@ function PlayedCards() {
         console.log("index: " + index);
         const playedByRelativePosition = (index - seat + 4) % 4;
         console.log("relative position: " + playedByRelativePosition);
+
+        if (playedCards.size === 4) {
+            // Clearing last trick and starting new one.
+            setPlayedCards(new Map<number, Card>([[playedByRelativePosition, card]]));
+            return;
+        }
+
+
         const newPlayedCards = new Map(playedCards);
         newPlayedCards.set(playedByRelativePosition, card);
         setPlayedCards(newPlayedCards);

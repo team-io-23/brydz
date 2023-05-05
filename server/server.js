@@ -99,8 +99,6 @@ io.on('connection', function (socket) {
         var playerIndex = rooms.get(roomID).indexOf(socket.id);
         currentTricks.get(roomID).push(card);
         var currentSuit = currentTricks.get(roomID)[0].suit;
-        var currentTurn = (currentTurns.get(roomID) + 1) % 4;
-        currentTurns.set(roomID, currentTurn);
         io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
         if (currentTricks.get(roomID).length === 4) {
             // Trick is over.
@@ -111,6 +109,8 @@ io.on('connection', function (socket) {
             io.in(rooms.get(roomID)[winnerIndex]).emit('your-turn'); // Sending info to trick winner.
             return;
         }
+        var currentTurn = (currentTurns.get(roomID) + 1) % 4;
+        currentTurns.set(roomID, currentTurn);
         io.in(rooms.get(roomID)[currentTurn]).emit('your-turn');
     });
 });

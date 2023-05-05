@@ -16,11 +16,6 @@ export interface Result {
 function Room() {
     let [result, setResult] = useState<Result>({ teamOne: 0, teamTwo: 0 });
 
-    socket.on("your-turn", () => {
-        console.log("It's your turn!");
-        localStorage.setItem(`turn-${socket.id}`, "true");
-    });
-
     socket.on("trick-over", (winner: number) => {
         // TODO: Clear table when trick is over.
         console.log("Trick over! Winner: " + winner);

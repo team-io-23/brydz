@@ -33,3 +33,8 @@ export const socket = io(SERVER);
 socket.on("connect", () => {
   console.log("Connected to server");
 });
+
+socket.on("your-turn", () => {
+  console.log("It's your turn!");
+  localStorage.setItem(`turn-${socket.id}`, "true");
+});
