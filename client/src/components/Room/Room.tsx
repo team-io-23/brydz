@@ -41,9 +41,12 @@ function Room() {
         localStorage.setItem("suit", currentSuit);
     });
 
+    let contractString = localStorage.getItem("contract")!;
+    let contract = { value: contractString.split(" ")[0], trump: contractString.split(" ")[1] };
+
     return (
         <div style={{ height: "300px" }}>
-            <TopBar teamOne={result.teamOne} teamTwo={result.teamTwo} />
+            <TopBar result={result} contract={contract}/>
             <NorthHandView />
             <WestHandView />
             <EastHandView />

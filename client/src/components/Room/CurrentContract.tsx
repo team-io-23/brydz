@@ -1,18 +1,15 @@
 import './TopBar.css';
 import React from "react";
+import { Bid, trumpSymbols } from "../../utils";
 
-interface Props {
-    contract: [string, string];
-}
-
-
-const CurrentContract: React.FC<Props> = ({ contract }) => {
+const CurrentContract: React.FC<Bid> = ({ value, trump }) => {
     // TODO - coloring of suit
+    let symbol = trumpSymbols.get(trump)!;
     return (
         <div className="info-box right">
             Contract: 
             <div className="contract-box">
-                {contract[0]} {contract[1]}
+                {value} {symbol}
             </div>
         </div>
     )

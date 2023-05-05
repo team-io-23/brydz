@@ -51,7 +51,44 @@ export function BiddingOptions () {
     return options;
 }
 
+export const ZERO_BID = "0 clubs";
+
+export const trumpSymbols = new Map<string, string>([
+    ["clubs", "♣"],
+    ["diams", "♦"],
+    ["hearts", "♥"],
+    ["spades", "♠"],
+    ["no-trump", "NT"]
+]);
+
+const trumpValues = new Map<string, number>([
+    ["clubs", 0],
+    ["diams", 1],
+    ["hearts", 2],
+    ["spades", 3],
+    ["no-trump", 4]
+]);
+
 
 export function checkCorrectBid(bid: Bid, currentBid: Bid) {
-    return true;
+    // TODO - doubles and redoubles
+    if (bid === undefined || currentBid === undefined) {
+        return false;
+    }
+
+    if (bid.value === "pass") {
+        return true;
+    }
+
+    let trumpValue = trumpValues.get(bid.trump)!;
+    let currentTrumpValue = trumpValues.get(currentBid.trump)!;
+
+    console.log("Bid: " + bid.value + " " + bid.trump + " " + trumpValue);
+    console.log("Current Bid: " + currentBid.value + " " + currentBid.trump + " " + currentTrumpValue);
+
+    if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
+        return true;
+    } else {
+        return false;
+    }
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { socket } from "../App";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router";
+import { ZERO_BID } from "../../utils";
 
 function WaitingRoom() {
     let [playersInRoom, setPlayersInRoom] = useState<string[]>([]);
@@ -15,7 +16,8 @@ function WaitingRoom() {
         console.log("Started game");
         localStorage.setItem("players", playersInRoom.toString());
         localStorage.setItem("seat", playersInRoom.indexOf(localStorage.getItem("nickname")!).toString());
-        navigate("/room"); // TODO - change to bidding later
+        localStorage.setItem("bid", ZERO_BID);
+        navigate("/bidding");
     });
 
     function handleLeave() {
