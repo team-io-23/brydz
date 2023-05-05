@@ -31,10 +31,12 @@ function HandView() {
         let turn = localStorage.getItem("turn") === "true";
         let currentSuit = localStorage.getItem("suit")!;
 
-        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) {
-            console.log("Illegal card! / Not your turn!");
-            return;
-        }
+        // if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) { // TODO upsi dupsi naprawić iffa
+        //     console.log("Illegal card! / Not your turn!");
+        //     console.log("Turn", turn);
+        //     console.log(checkCorrectCard(hand, cardSuit, currentSuit));
+        //     return;
+        // }
 
         if (currentSuit === "") {
             localStorage.setItem("suit", cardSuit);

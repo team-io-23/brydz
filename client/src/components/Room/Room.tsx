@@ -4,6 +4,8 @@ import TopBar from "./TopBar";
 import { socket } from "../App";
 import { Card } from "../../utils";
 import { useState } from "react";
+import PlayedCards from "./PlayedCards";
+import { json } from "stream/consumers";
 
 // Team one - players 0 and 2, team two - players 1 and 3.
 export interface Result {
@@ -34,12 +36,6 @@ function Room() {
 
     });
 
-    socket.on("card-played", (card: Card, currentSuit: string, playedBy: number) => {
-        // TODO: Do stuff when someone plays a card.
-        console.log("Current suit: " + currentSuit);
-        console.log("Player number " + playedBy + " played card: " + card.rank + " of " + card.suit);
-        localStorage.setItem("suit", currentSuit);
-    });
 
     return (
         <div style={{ height: "300px" }}>
@@ -48,6 +44,7 @@ function Room() {
             <WestHandView />
             <EastHandView />
             <Table />
+            <PlayedCards />
             <HandView />
         </div>
     )
