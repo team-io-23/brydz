@@ -12,6 +12,11 @@ interface Card {
     symbol: string;
 }
 
+interface Bid {
+    value: string;
+    suit: string;
+}
+
 const cardValues = new Map<string, number>([
     ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
     ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
@@ -24,6 +29,7 @@ let currentRoomID = 0;
 let currentTricks = new Map<number, Card[]>(); // roomID, played cards
 let currentTurns = new Map<number, number>(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 let currentTrumps = new Map<number, string>(); // roomID, trump suit
+let biddingHistory = new Map<number, Bid[]>(); // roomID, bids
 
 function getWinner(roomID: number) {
     let trump = currentTrumps.get(roomID)!;
@@ -66,6 +72,24 @@ function getWinner(roomID: number) {
     return winner;
 }
 
+
+function checkForThreePasses(roomID: number) {
+    let bids = biddingHistory.get(roomID)!;
+    if (bids.length < 3) {
+        return false;
+    }
+
+    let passes = 0;
+    for (let i = bids.length - 1; i >= bids.length - 3; i--) {
+        if (bids[i].value === 'pass') {
+            passes++;
+        }
+    }
+
+    return passes === 3;
+}
+
+
 io.on('connection', socket => {
     console.log('connected');
     
@@ -86,6 +110,7 @@ io.on('connection', socket => {
             currentTricks.set(currentRoomID, []);
             currentTurns.set(currentRoomID, 0);
             currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
+            biddingHistory.set(currentRoomID, []);
         }
 
         // Joining room.
@@ -147,5 +172,23 @@ io.on('connection', socket => {
         currentTurns.set(roomID, currentTurn);
         io.in(rooms.get(roomID)![currentTurn]).emit('your-turn');
 
+    });
+
+
+    socket.on('bid', (bid: Bid) => {
+        // TODO - add 4 passes check
+        // TODO - doubles/redoubles
+        const roomID = playerRooms.get(socket.id)!;
+
+        biddingHistory.get(roomID)!.push(bid);
+
+        if (checkForThreePasses(roomID)) {
+            // Bidding is over.
+            console.log("Bidding over");
+            io.in(roomID).emit('bidding-over');
+            return;
+        }
+
+        io.in(roomID).emit('bid-made', bid);
     });
 });

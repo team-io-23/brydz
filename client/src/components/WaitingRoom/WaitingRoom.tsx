@@ -2,6 +2,7 @@ import { useState } from "react";
 import { socket } from "../App";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router";
+import { ZERO_BID } from "../../utils";
 
 function WaitingRoom() {
     let [playersInRoom, setPlayersInRoom] = useState<string[]>([]);
@@ -16,7 +17,8 @@ function WaitingRoom() {
         let nickname = localStorage.getItem(`nickname-${socket.id}`)!;
         localStorage.setItem(`players-${socket.id}`, playersInRoom.toString());
         localStorage.setItem(`seat-${socket.id}`, playersInRoom.indexOf(nickname).toString());
-        navigate("/room");
+        localStorage.setItem(`bid-${socket.id}`, ZERO_BID);
+        navigate("/bidding");
     });
 
     function handleLeave() {

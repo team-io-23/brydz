@@ -2,14 +2,18 @@ import CurrentScore from "./CurrentScore";
 import CurrentContract from "./CurrentContract";
 import './TopBar.css'
 import { Result } from "./Room";
+import { Bid } from "../../utils";
 
-function TopBar(result: Result) {
-    const contract: [string, string] = ["3", "♦"];
+interface Props {
+    result: Result;
+    contract: Bid;
+}
 
+function TopBar(props: Props) {
     return (
         <div className="top-container">
-            <CurrentScore teamOne={result.teamOne} teamTwo={result.teamTwo} />
-            <CurrentContract contract={contract} />
+            <CurrentScore teamOne={props.result.teamOne} teamTwo={props.result.teamTwo} />
+            <CurrentContract value={props.contract.value} trump={props.contract.trump} />
         </div>
     )
 }

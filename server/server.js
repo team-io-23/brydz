@@ -15,6 +15,7 @@ var currentRoomID = 0;
 var currentTricks = new Map(); // roomID, played cards
 var currentTurns = new Map(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 var currentTrumps = new Map(); // roomID, trump suit
+var biddingHistory = new Map(); // roomID, bids
 function getWinner(roomID) {
     var trump = currentTrumps.get(roomID);
     var cards = currentTricks.get(roomID);
@@ -50,6 +51,19 @@ function getWinner(roomID) {
     var winner = (firstPlayer + cards.indexOf(highest)) % 4;
     return winner;
 }
+function checkForThreePasses(roomID) {
+    var bids = biddingHistory.get(roomID);
+    if (bids.length < 3) {
+        return false;
+    }
+    var passes = 0;
+    for (var i = bids.length - 1; i >= bids.length - 3; i--) {
+        if (bids[i].value === 'pass') {
+            passes++;
+        }
+    }
+    return passes === 3;
+}
 io.on('connection', function (socket) {
     console.log('connected');
     socket.on('joining-room', function (nickname) {
@@ -67,6 +81,7 @@ io.on('connection', function (socket) {
             currentTricks.set(currentRoomID, []);
             currentTurns.set(currentRoomID, 0);
             currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
+            biddingHistory.set(currentRoomID, []);
         }
         // Joining room.
         socket.join(currentRoomID);
@@ -112,5 +127,18 @@ io.on('connection', function (socket) {
         var currentTurn = (currentTurns.get(roomID) + 1) % 4;
         currentTurns.set(roomID, currentTurn);
         io.in(rooms.get(roomID)[currentTurn]).emit('your-turn');
+    });
+    socket.on('bid', function (bid) {
+        // TODO - add 4 passes check
+        // TODO - doubles/redoubles
+        var roomID = playerRooms.get(socket.id);
+        biddingHistory.get(roomID).push(bid);
+        if (checkForThreePasses(roomID)) {
+            // Bidding is over.
+            console.log("Bidding over");
+            io.in(roomID).emit('bidding-over');
+            return;
+        }
+        io.in(roomID).emit('bid-made', bid);
     });
 });
