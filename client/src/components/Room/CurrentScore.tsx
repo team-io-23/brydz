@@ -1,9 +1,9 @@
 import React from "react";
 import './TopBar.css';
-import { Result } from "./Room";
 import { socket } from "../App";
+import { Score } from "../../utils";
 
-const CurrentScore: React.FC<Result> = ({ teamOne, teamTwo }) => {
+const CurrentScore: React.FC<Score> = ({ teamOne, teamTwo }) => {
     let players = localStorage.getItem(`players-${socket.id}`)!.split(",");
     if (players.length !== 4) {
         players = ["Player 1", "Player 2", "Player 3", "Player 4"]; // TODO: testing purposes

@@ -1,7 +1,8 @@
 "use strict";
-// TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkCorrectBid = void 0;
+// TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
+var server_utils_1 = require("./server-utils");
 var io = require('socket.io')(8000, {
     cors: {
         origin: '*',
@@ -28,6 +29,8 @@ var currentTurns = new Map(); // roomID, 0 - North, 1 - East, 2 - South, 3 - Wes
 var currentTrumps = new Map(); // roomID, trump suit
 var biddingHistory = new Map(); // roomID, bids
 var results = new Map(); // roomID, scores
+var currentHands = new Map(); // roomID, hands
+var currenDummy = new Map(); // roomID, dummy player
 function initRoom(roomID) {
     rooms.set(roomID, []);
     currentTricks.set(roomID, []);
@@ -35,6 +38,37 @@ function initRoom(roomID) {
     currentTrumps.set(roomID, 'Spades'); // TODO - testing
     biddingHistory.set(roomID, [ZERO_BID]);
     results.set(roomID, { teamOne: 0, teamTwo: 0 });
+    currentHands.set(roomID, []);
+    currenDummy.set(roomID, -1);
+    dealCards(roomID);
+}
+function dealCards(roomID) {
+    var cards = shuffleArray(server_utils_1.allCards);
+    var hands = [[], [], [], []];
+    for (var i = 0; i < 52; i++) {
+        hands[i % 4].push(cards[i]);
+    }
+    currentHands.set(roomID, [
+        { cards: hands[0], player: 0 },
+        { cards: hands[1], player: 1 },
+        { cards: hands[2], player: 2 },
+        { cards: hands[3], player: 3 }
+    ]);
+}
+function sendCards(socket) {
+    var roomID = playerRooms.get(socket.id);
+    var playerID = rooms.get(roomID).indexOf(socket.id);
+    var dummyID = currenDummy.get(roomID);
+    var hands = (0, server_utils_1.hideCards)(currentHands.get(roomID), playerID, dummyID);
+    socket.emit('hand-update', hands);
+}
+function shuffleArray(array) {
+    var _a;
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        _a = [array[j], array[i]], array[i] = _a[0], array[j] = _a[1];
+    }
+    return array;
 }
 function getWinner(roomID) {
     var trump = currentTrumps.get(roomID);
@@ -145,6 +179,7 @@ io.on('connection', function (socket) {
         console.log(rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
+        io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
     socket.on('play-card', function (card) {
         console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
@@ -153,6 +188,11 @@ io.on('connection', function (socket) {
         currentTricks.get(roomID).push(card);
         var currentSuit = currentTricks.get(roomID)[0].suit;
         io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
+        // Update hands
+        var hands = currentHands.get(roomID);
+        hands[playerIndex].cards = hands[playerIndex].cards.filter(function (c) { return c.rank !== card.rank || c.suit !== card.suit; });
+        currentHands.set(roomID, hands);
+        sendCards(socket);
         if (currentTricks.get(roomID).length === 4) {
             // Trick is over.
             var winnerIndex = getWinner(roomID);
@@ -200,5 +240,8 @@ io.on('connection', function (socket) {
         }
         console.log("Bid made by: " + socket.id + " " + bid.value);
         io.in(roomID).emit('bid-made', bid);
+    });
+    socket.on('get-hands', function () {
+        sendCards(socket);
     });
 });

@@ -1,4 +1,6 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
+import { allCards, hideCards } from './server-utils';
+import { Bid, Card, Score, Hand } from './types';
 
 const io = require('socket.io')(8000, {
     cors: {
@@ -6,27 +8,6 @@ const io = require('socket.io')(8000, {
     }
 });
 
-interface Card {
-    rank: string;
-    suit: string;
-    symbol: string;
-}
-
-interface Bid {
-    value: string;
-    trump: string;
-    bidder: number;
-}
-
-interface Score {
-    teamOne: number;
-    teamTwo: number;
-}
-
-interface Hand {
-    cards: Array<Card>;
-    player: number;
-}
 
 const cardValues = new Map<string, number>([
     ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
@@ -36,6 +17,7 @@ const cardValues = new Map<string, number>([
 const trumpValues = new Map<string, number>([
     ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
 ]);
+
 
 const ZERO_BID: Bid = {
     value: '0',
@@ -51,8 +33,9 @@ let currentTricks = new Map<number, Card[]>(); // roomID, played cards
 let currentTurns = new Map<number, number>(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 let currentTrumps = new Map<number, string>(); // roomID, trump suit
 let biddingHistory = new Map<number, Bid[]>(); // roomID, bids
-let results = new Map<number, Score>(); // roomID, scores\
+let results = new Map<number, Score>(); // roomID, scores
 let currentHands = new Map<number, Hand[]>(); // roomID, hands
+let currenDummy = new Map<number, number>(); // roomID, dummy player
 
 function initRoom(roomID: number) {
     rooms.set(roomID, []);
@@ -62,7 +45,46 @@ function initRoom(roomID: number) {
     biddingHistory.set(roomID, [ZERO_BID]);
     results.set(roomID, {teamOne: 0, teamTwo: 0});
     currentHands.set(roomID, []);
+    currenDummy.set(roomID, -1);
+    dealCards(roomID);
 }
+
+
+function dealCards(roomID: number) {
+    let cards = shuffleArray(allCards);
+    let hands: Card[][] = [[], [], [], []]
+    for (let i = 0; i < 52; i++) {
+        hands[i % 4].push(cards[i]);
+    }
+
+    currentHands.set(roomID, [
+        {cards: hands[0], player: 0},
+        {cards: hands[1], player: 1},
+        {cards: hands[2], player: 2},
+        {cards: hands[3], player: 3}
+    ]);
+}
+
+
+function sendCards(socket: any) {
+    const roomID = playerRooms.get(socket.id)!;
+    const playerID = rooms.get(roomID)!.indexOf(socket.id);
+    const dummyID = currenDummy.get(roomID)!;
+
+    let hands = hideCards(currentHands.get(roomID)!, playerID, dummyID);
+    socket.emit('hand-update', hands);
+}
+
+
+function shuffleArray(array: Array<any>) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+
+    return array;
+}
+
 
 function getWinner(roomID: number) {
     let trump = currentTrumps.get(roomID)!;
@@ -200,6 +222,7 @@ io.on('connection', socket => {
         console.log(rooms.get(roomID)!.map(id => nicknames.get(id)));
         io.in(roomID).emit('started-game', rooms.get(roomID)!.map(id => nicknames.get(id)));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
+        io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
 
 
@@ -216,7 +239,7 @@ io.on('connection', socket => {
         let hands = currentHands.get(roomID)!;
         hands[playerIndex].cards = hands[playerIndex].cards.filter(c => c.rank !== card.rank || c.suit !== card.suit);
         currentHands.set(roomID, hands);
-        io.in(roomID).emit('hand-update', hands);
+        sendCards(socket);
 
         if (currentTricks.get(roomID)!.length === 4) {
             // Trick is over.
@@ -276,5 +299,10 @@ io.on('connection', socket => {
 
         console.log("Bid made by: " + socket.id + " " + bid.value)
         io.in(roomID).emit('bid-made', bid);
+    });
+
+
+    socket.on('get-hands', () => {
+        sendCards(socket);
     });
 });

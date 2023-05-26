@@ -1,35 +1,17 @@
 import '../cards.css';
 import '../buttons.css';
 import React, { useState } from 'react';
-import { Card, checkCorrectCard } from '../../../utils';
+import { Card, checkCorrectCard, trumpSymbols, Hand } from '../../../utils';
 import { socket } from '../../App';
 
-function HandView(dummy: boolean) {
+interface HandViewProps {
+    player: number;
+    position: string;
+    hand: Hand
+}
+
+function HandView({ player, position, hand }: HandViewProps) {
     // TODO: Replace this with the actual hand.
-    var playerHand: Array<Card> = [
-        { rank: "a", suit: "clubs", symbol: "♣" },
-        { rank: "k", suit: "spades", symbol: "♠" },
-        { rank: "q", suit: "hearts", symbol: "♥" },
-        { rank: "j", suit: "diams", symbol: "♦" },
-        { rank: "10", suit: "clubs", symbol: "♣" },
-        { rank: "9", suit: "spades", symbol: "♠" },
-        { rank: "8", suit: "hearts", symbol: "♥" },
-        { rank: "7", suit: "diams", symbol: "♦" },
-        { rank: "6", suit: "clubs", symbol: "♣" },
-        { rank: "5", suit: "spades", symbol: "♠" },
-        { rank: "4", suit: "hearts", symbol: "♥" },
-        { rank: "3", suit: "diams", symbol: "♦" },
-        { rank: "2", suit: "clubs", symbol: "♣" },
-    ];
-
-    const symbols: { [key: string]: string } = {
-        "clubs": "♣",
-        "spades": "♠",
-        "hearts": "♥",
-        "diams": "♦",
-    };
-
-    let [hand, setHand] = useState<Array<Card>>(playerHand);
 
     function playCard(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
         let card = event.currentTarget.className;
@@ -38,10 +20,10 @@ function HandView(dummy: boolean) {
         let turn = localStorage.getItem(`turn-${socket.id}`) === "true";
         let currentSuit = localStorage.getItem(`suit-${socket.id}`)!;
 
-        if (!checkCorrectCard(hand, cardSuit, currentSuit) || !turn) {
+        if (!checkCorrectCard(hand.cards, cardSuit, currentSuit) || !turn) {
             console.log("Illegal card! / Not your turn!");
             console.log("Turn", turn);
-            console.log(checkCorrectCard(hand, cardSuit, currentSuit));
+            console.log(checkCorrectCard(hand.cards, cardSuit, currentSuit));
             return;
         }
 
@@ -52,19 +34,16 @@ function HandView(dummy: boolean) {
         localStorage.setItem(`turn-${socket.id}`, "false");
 
         // Symbol is not needed here, we can just keep it empty.
-        socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: symbols[cardSuit] });
-        console.log("Played " + cardRank + " of " + cardSuit);
-        // Remove card from hand
-        setHand(hand.filter((card) => card.rank !== cardRank || card.suit !== cardSuit));
+        socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: '' });
     }
 
     return (
         <div className="southHand">
             <div className="playingCards faceImages">
                 <ul className="table">
-                    {hand.map(({ rank, suit, symbol }) => (
+                    {hand.cards.map(({ rank, suit, symbol }) => (
                         <li key={rank + suit}>
-                            <a className={`card rank-${rank} ${suit} myAllCards ${dummy ? 'dummy' : ''}`} onClick={playCard}>
+                            <a className={`card rank-${rank} ${suit} myAllCards`} onClick={playCard}>
                                 <span className="rank">{rank.toUpperCase()}</span>
                                 <span className="suit">{symbol}</span>
                             </a>
@@ -76,12 +55,4 @@ function HandView(dummy: boolean) {
     );
 }
 
-function PlayerHandView() {
-    return HandView(false);
-}
-
-function DummyHandView() {
-    return HandView(true);
-}
-
-export { PlayerHandView, DummyHandView };
+export default HandView;

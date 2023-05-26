@@ -8,6 +8,7 @@ import io from 'socket.io-client';
 import { SERVER } from '../config';
 import WaitingRoom from './WaitingRoom/WaitingRoom';
 import Bidding from './Bidding/Bidding';
+import { Hand } from '../utils';
 
 function App() {
   const theme = createTheme(); // TODO: Add custom theme
