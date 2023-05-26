@@ -1,4 +1,4 @@
-import { Hand, Card } from './types';
+import { Hand, Card, Bid } from './types';
 
 export const allCards = [
     { suit: 'spades', rank: '2', symbol:'♠' },
@@ -71,4 +71,31 @@ export function hideCards(hands: Hand[], player: number, dummy: number) {
     }
 
     return resultHands;
+}
+
+
+// Finds the last bid that is not a pass
+export function findLastLegitBid(bids: Bid[]){
+    let index = bids.length - 1;
+    let lastBid = bids[index];
+
+    while (lastBid.value === 'pass' || lastBid.value === 'double' || lastBid.value === 'redouble') {
+        index--;
+        lastBid = bids[index];
+    }
+    
+    return lastBid;
+}
+
+
+export function findDeclarer(bids: Bid[]) {
+    const contractBid: Bid = findLastLegitBid(bids);
+    const contractTrump: string = contractBid.trump;
+
+    console.log(contractBid);
+    console.log(bids);
+
+    const declarer: number = bids.find(bid => bid.trump === contractTrump && bid.value !== 'pass')?.bidder!;
+
+    return declarer;
 }

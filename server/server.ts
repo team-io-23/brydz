@@ -1,5 +1,5 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
-import { allCards, hideCards } from './server-utils';
+import { allCards, findDeclarer, findLastLegitBid, hideCards } from './server-utils';
 import { Bid, Card, Score, Hand } from './types';
 
 const io = require('socket.io')(8000, {
@@ -35,7 +35,7 @@ let currentTrumps = new Map<number, string>(); // roomID, trump suit
 let biddingHistory = new Map<number, Bid[]>(); // roomID, bids
 let results = new Map<number, Score>(); // roomID, scores
 let currentHands = new Map<number, Hand[]>(); // roomID, hands
-let currenDummy = new Map<number, number>(); // roomID, dummy player
+let currentDummy = new Map<number, number>(); // roomID, dummy player
 
 function initRoom(roomID: number) {
     rooms.set(roomID, []);
@@ -45,7 +45,7 @@ function initRoom(roomID: number) {
     biddingHistory.set(roomID, [ZERO_BID]);
     results.set(roomID, {teamOne: 0, teamTwo: 0});
     currentHands.set(roomID, []);
-    currenDummy.set(roomID, -1);
+    currentDummy.set(roomID, -1);
     dealCards(roomID);
 }
 
@@ -69,7 +69,7 @@ function dealCards(roomID: number) {
 function sendCards(socket: any) {
     const roomID = playerRooms.get(socket.id)!;
     const playerID = rooms.get(roomID)!.indexOf(socket.id);
-    const dummyID = currenDummy.get(roomID)!;
+    const dummyID = currentDummy.get(roomID)!;
 
     let hands = hideCards(currentHands.get(roomID)!, playerID, dummyID);
     socket.emit('hand-update', hands);
@@ -98,8 +98,6 @@ function getWinner(roomID: number) {
         if (highest !== undefined) {
             highestRank = cardValues.get(highest.rank);
         }
-
-        console.log(cards[i].rank + ' ' + cards[i].suit + ' ' + rank + ' ' + highestRank);
         
         if (highest === undefined) {
             // First card in a trick.
@@ -116,8 +114,6 @@ function getWinner(roomID: number) {
             }
         }
     }
-
-    console.log("Highest: " + cards.indexOf(highest));
 
     // We made it around the table - last player is saved in currentTurns now.
     // We need to add 1 mod 4 to get to the first player.
@@ -141,8 +137,6 @@ export function checkCorrectBid(bid: Bid, currentBid: Bid) {
     let trumpValue = trumpValues.get(bid.trump)!;
     let currentTrumpValue = trumpValues.get(currentBid.trump)!;
 
-    console.log("Bid: " + bid.value + " " + bid.trump + " " + trumpValue);
-    console.log("Current Bid: " + currentBid.value + " " + currentBid.trump + " " + currentTrumpValue);
 
     if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
         return true;
@@ -218,8 +212,7 @@ io.on('connection', socket => {
 
     socket.on('start-game', () => {
         const roomID = playerRooms.get(socket.id)!;
-        console.log(rooms.get(roomID));
-        console.log(rooms.get(roomID)!.map(id => nicknames.get(id)));
+
         io.in(roomID).emit('started-game', rooms.get(roomID)!.map(id => nicknames.get(id)));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
@@ -293,7 +286,14 @@ io.on('connection', socket => {
         if (checkForThreePasses(roomID)) {
             // Bidding is over.
             console.log("Bidding over");
+            let declarer = findDeclarer(biddingHistory.get(roomID)!);
+            currentDummy.set(roomID, (declarer + 2) % 4);
+
+            //currentTurns.set(roomID, (declarer + 1) % 4); // TODO
+            console.log("Declarer: " + declarer);
+            console.log("Dummy: " + currentDummy.get(roomID));
             io.in(roomID).emit('bidding-over');
+
             return;
         }
 

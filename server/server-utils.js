@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hideCards = exports.placeholderCard = exports.allCards = void 0;
+exports.findDeclarer = exports.findLastLegitBid = exports.hideCards = exports.placeholderCard = exports.allCards = void 0;
 exports.allCards = [
     { suit: 'spades', rank: '2', symbol: '♠' },
     { suit: 'spades', rank: '3', symbol: '♠' },
@@ -70,3 +70,24 @@ function hideCards(hands, player, dummy) {
     return resultHands;
 }
 exports.hideCards = hideCards;
+// Finds the last bid that is not a pass
+function findLastLegitBid(bids) {
+    var index = bids.length - 1;
+    var lastBid = bids[index];
+    while (lastBid.value === 'pass' || lastBid.value === 'double' || lastBid.value === 'redouble') {
+        index--;
+        lastBid = bids[index];
+    }
+    return lastBid;
+}
+exports.findLastLegitBid = findLastLegitBid;
+function findDeclarer(bids) {
+    var _a;
+    var contractBid = findLastLegitBid(bids);
+    var contractTrump = contractBid.trump;
+    console.log(contractBid);
+    console.log(bids);
+    var declarer = (_a = bids.find(function (bid) { return bid.trump === contractTrump && bid.value !== 'pass'; })) === null || _a === void 0 ? void 0 : _a.bidder;
+    return declarer;
+}
+exports.findDeclarer = findDeclarer;

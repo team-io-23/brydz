@@ -30,7 +30,7 @@ var currentTrumps = new Map(); // roomID, trump suit
 var biddingHistory = new Map(); // roomID, bids
 var results = new Map(); // roomID, scores
 var currentHands = new Map(); // roomID, hands
-var currenDummy = new Map(); // roomID, dummy player
+var currentDummy = new Map(); // roomID, dummy player
 function initRoom(roomID) {
     rooms.set(roomID, []);
     currentTricks.set(roomID, []);
@@ -39,7 +39,7 @@ function initRoom(roomID) {
     biddingHistory.set(roomID, [ZERO_BID]);
     results.set(roomID, { teamOne: 0, teamTwo: 0 });
     currentHands.set(roomID, []);
-    currenDummy.set(roomID, -1);
+    currentDummy.set(roomID, -1);
     dealCards(roomID);
 }
 function dealCards(roomID) {
@@ -58,7 +58,7 @@ function dealCards(roomID) {
 function sendCards(socket) {
     var roomID = playerRooms.get(socket.id);
     var playerID = rooms.get(roomID).indexOf(socket.id);
-    var dummyID = currenDummy.get(roomID);
+    var dummyID = currentDummy.get(roomID);
     var hands = (0, server_utils_1.hideCards)(currentHands.get(roomID), playerID, dummyID);
     socket.emit('hand-update', hands);
 }
@@ -80,7 +80,6 @@ function getWinner(roomID) {
         if (highest !== undefined) {
             highestRank = cardValues.get(highest.rank);
         }
-        console.log(cards[i].rank + ' ' + cards[i].suit + ' ' + rank + ' ' + highestRank);
         if (highest === undefined) {
             // First card in a trick.
             highest = cards[i];
@@ -98,7 +97,6 @@ function getWinner(roomID) {
             }
         }
     }
-    console.log("Highest: " + cards.indexOf(highest));
     // We made it around the table - last player is saved in currentTurns now.
     // We need to add 1 mod 4 to get to the first player.
     var firstPlayer = (currentTurns.get(roomID) + 1) % 4;
@@ -115,8 +113,6 @@ function checkCorrectBid(bid, currentBid) {
     }
     var trumpValue = trumpValues.get(bid.trump);
     var currentTrumpValue = trumpValues.get(currentBid.trump);
-    console.log("Bid: " + bid.value + " " + bid.trump + " " + trumpValue);
-    console.log("Current Bid: " + currentBid.value + " " + currentBid.trump + " " + currentTrumpValue);
     if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
         return true;
     }
@@ -175,8 +171,6 @@ io.on('connection', function (socket) {
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
-        console.log(rooms.get(roomID));
-        console.log(rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
@@ -235,6 +229,11 @@ io.on('connection', function (socket) {
         if (checkForThreePasses(roomID)) {
             // Bidding is over.
             console.log("Bidding over");
+            var declarer = (0, server_utils_1.findDeclarer)(biddingHistory.get(roomID));
+            currentDummy.set(roomID, (declarer + 2) % 4);
+            //currentTurns.set(roomID, (declarer + 1) % 4); // TODO
+            console.log("Declarer: " + declarer);
+            console.log("Dummy: " + currentDummy.get(roomID));
             io.in(roomID).emit('bidding-over');
             return;
         }
