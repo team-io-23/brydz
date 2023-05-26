@@ -14,13 +14,18 @@ interface Card {
 
 interface Bid {
     value: string;
-    suit: string;
+    trump: string;
+    bidder: number;
 }
 
 const cardValues = new Map<string, number>([
     ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
     ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
 ])
+
+const trumpValues = new Map<string, number>([
+    ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
+]);
 
 const playerRooms = new Map<string, number>();
 const rooms = new Map<number, string[]>();
@@ -70,6 +75,30 @@ function getWinner(roomID: number) {
     let winner = (firstPlayer + cards.indexOf(highest)) % 4;
 
     return winner;
+}
+
+
+export function checkCorrectBid(bid: Bid, currentBid: Bid) {
+    // TODO - doubles and redoubles
+    if (bid === undefined || currentBid === undefined) {
+        return false;
+    }
+
+    if (bid.value === "pass") {
+        return true;
+    }
+
+    let trumpValue = trumpValues.get(bid.trump)!;
+    let currentTrumpValue = trumpValues.get(currentBid.trump)!;
+
+    console.log("Bid: " + bid.value + " " + bid.trump + " " + trumpValue);
+    console.log("Current Bid: " + currentBid.value + " " + currentBid.trump + " " + currentTrumpValue);
+
+    if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 
@@ -143,7 +172,9 @@ io.on('connection', socket => {
 
     socket.on('start-game', () => {
         const roomID = playerRooms.get(socket.id)!;
-        io.in(roomID).emit('started-game');
+        console.log(rooms.get(roomID));
+        console.log(rooms.get(roomID)!.map(id => nicknames.get(id)));
+        io.in(roomID).emit('started-game', rooms.get(roomID)!.map(id => nicknames.get(id)));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
     });
 
@@ -176,9 +207,14 @@ io.on('connection', socket => {
 
 
     socket.on('bid', (bid: Bid) => {
-        // TODO - add 4 passes check
         // TODO - doubles/redoubles
         const roomID = playerRooms.get(socket.id)!;
+        const lastBid = biddingHistory.get(roomID)![biddingHistory.get(roomID)!.length - 1];
+
+        if (!checkCorrectBid(bid, lastBid)) {
+            console.log("Illegal bid / Not your turn!");
+            return;
+        } // TODO - testing, add turn check later
 
         biddingHistory.get(roomID)!.push(bid);
 
@@ -189,6 +225,7 @@ io.on('connection', socket => {
             return;
         }
 
+        console.log("Bid made by: " + socket.id + " " + bid.value)
         io.in(roomID).emit('bid-made', bid);
     });
 });

@@ -2,10 +2,11 @@ import { HandView, NorthHandView, WestHandView, EastHandView } from "./HandView"
 import Table from "./Table";
 import TopBar from "./TopBar";
 import { socket } from "../App";
-import { Card } from "../../utils";
+import { Contract } from "../../utils";
 import { useState } from "react";
 import PlayedCards from "./PlayedCards";
 import { json } from "stream/consumers";
+import { BindingOrAssignmentElement } from "typescript";
 
 // Team one - players 0 and 2, team two - players 1 and 3.
 export interface Result {
@@ -32,8 +33,7 @@ function Room() {
     });
 
 
-    let contractString = localStorage.getItem(`contract-${socket.id}`)!;
-    let contract = { value: contractString.split(" ")[0], trump: contractString.split(" ")[1] };
+    let contract:Contract = JSON.parse(localStorage.getItem(`contract-${socket.id}`)!);
 
     return (
         <div>

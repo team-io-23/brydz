@@ -1,47 +1,71 @@
-import { BiddingOptions, Bid, checkCorrectBid, ZERO_BID } from "../../utils";
+import { BiddingOptions, Bid, IsPassBid } from "../../utils";
 import { Button } from "@mui/material";
 import "./Bidding.css";
 import { socket } from "../App";
 import { useNavigate } from "react-router";
+import CurrentContract from "../Room/CurrentContract";
+import { useEffect, useState } from "react";
+import CurrentBidder from "./CurrentBidder";
+import BiddingHistory from "./BiddingHistory";
 
 // TODO: testing html
 function Bidding () {
     let biddingOptions = BiddingOptions();
     let navigate = useNavigate();
 
-    socket.on("bid-made", (bid: Bid) => {
-        // TODO - doubles and redoubles
-        if (bid.value !== "pass") {
-            localStorage.setItem(`bid-${socket.id}`, bid.value + " " + bid.trump);
+    let [bid, setBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Zero bid placeholder.
+    let [prevBid, setPrevBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Needed for the bullshit that is about to start.
+    let [actualBid, setActualBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Last non-pass bid.
+    
+    useEffect(() => {
+        console.log("Bidders: " + bid.bidder + ' ' + prevBid.bidder)
+        if (bid.bidder === prevBid.bidder) {
+            // This is a fix to a weird bug where the bid is emitted once but received multiple times.
+            return;
         }
+
+        setPrevBid(bid);
+
+        if (!IsPassBid(bid)) {
+            setActualBid(bid);
+        }
+        
+        // Setting current turn.
+        localStorage.setItem(`bid-turn-${socket.id}`, ((bid.bidder + 1) % 4).toString());
+        
+        let bidHistory:Array<Bid> = JSON.parse(localStorage.getItem(`bid-history-${socket.id}`)!);
+        console.log(bidHistory);
+
+        bidHistory.push(bid);
+        localStorage.setItem(`bid-history-${socket.id}`, JSON.stringify(bidHistory));
+    }, [bid]);
+
+    socket.on("bid-made", (newBid: Bid) => {
+        // TODO - doubles and redoubles
+        console.log("Bid value: " + newBid.value);
+        setBid(newBid);
     });
 
     socket.on("bidding-over", () => {
-        localStorage.setItem(`contract-${socket.id}`, localStorage.getItem(`bid-${socket.id}`)!);
+        localStorage.setItem(`contract-${socket.id}`, JSON.stringify(actualBid));
         navigate("/room");
     });
 
     function handleBid(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-        let turn = localStorage.getItem(`turn-${socket.id}`) === "true";
-
         let bidString = event.currentTarget.className.split("button ")[1];
-        let currentBidString = localStorage.getItem(`bid-${socket.id}`)!;
+        let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
+        let myBid = {value: bidString.split(" ")[0], trump: bidString.split(" ")[1], bidder: seat};
 
-        let bid = {value: bidString.split(" ")[0], trump: bidString.split(" ")[1]};
-        let currentBid = {value: currentBidString.split(" ")[0], trump: currentBidString.split(" ")[1]};
-
-        if (!checkCorrectBid(bid, currentBid)) {
-            console.log("Illegal bid / Not your turn!");
-            return;
-        } // TODO - testing, add turn check later
-
-        socket.emit("bid", bid);
-
-        alert("Bid " + bid.value + " " + bid.trump);
+        socket.emit("bid", myBid);
     }
 
     return (
         <div className="bidding">
+            <BiddingHistory />
+            <div className="top-container">
+                <CurrentBidder />
+                <CurrentContract value={actualBid.value} trump={actualBid.trump} />
+            </div>
             <div className="bidding-options">
                 {biddingOptions.map(({ value, trump, symbol }) => (
                     <button className={ `button ${value} ${trump}` } onClick={handleBid}>

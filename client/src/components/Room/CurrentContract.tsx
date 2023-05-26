@@ -1,8 +1,8 @@
 import './TopBar.css';
 import React from "react";
-import { Bid, trumpSymbols } from "../../utils";
+import { Contract, trumpSymbols } from "../../utils";
 
-const CurrentContract: React.FC<Bid> = ({ value, trump }) => {
+const CurrentContract: React.FC<Contract> = ({ value, trump }) => {
     // TODO - coloring of suit
     let symbol = trumpSymbols.get(trump)!;
     return (

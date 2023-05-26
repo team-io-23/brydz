@@ -105,7 +105,9 @@ io.on('connection', function (socket) {
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
-        io.in(roomID).emit('started-game');
+        console.log(rooms.get(roomID));
+        console.log(rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
+        io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
     });
     socket.on('play-card', function (card) {
@@ -139,6 +141,7 @@ io.on('connection', function (socket) {
             io.in(roomID).emit('bidding-over');
             return;
         }
+        console.log("Bid made by: " + socket.id + " " + bid.value);
         io.in(roomID).emit('bid-made', bid);
     });
 });
