@@ -12,7 +12,7 @@
 
 .northHand {
     position: absolute;
-    top: 0px;
+    top: 120px;
     margin-top: -15px;
     left: 50%;
     -webkit-transform: translateX(-50%);

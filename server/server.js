@@ -61,7 +61,8 @@ function sendCards(socket) {
     var roomID = playerRooms.get(socket.id);
     var playerID = rooms.get(roomID).indexOf(socket.id);
     var dummyID = currentDummy.get(roomID);
-    var hands = (0, server_utils_1.hideCards)(currentHands.get(roomID), playerID, dummyID);
+    var show = showDummy.get(roomID);
+    var hands = (0, server_utils_1.hideCards)(currentHands.get(roomID), playerID, dummyID, show);
     socket.emit('hand-update', hands);
 }
 function shuffleArray(array) {

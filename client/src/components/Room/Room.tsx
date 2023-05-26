@@ -74,13 +74,13 @@ function Room() {
                 <TopBar result={result} contract={contract}/>
                 <div className="play-table">
                     {hands.map((sth, index) => 
-                        backHand(index)
+                        backHand((seat + index) % 4)
                     )}
                     <PlayedCards />
                 </div>
 
                 {hands.map((sth, index) => 
-                    frontHand(index)
+                    frontHand((seat + index) % 4)
                 )}
                 
             </div>

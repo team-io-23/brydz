@@ -86,8 +86,8 @@ export const trumpSymbols = new Map<string, string>([
 ]);
 
 export const seats = new Map<number, string>([
-    [0, "North"],
-    [1, "East"],
-    [2, "South"],
-    [3, "West"]
+    [0, "South"],
+    [1, "West"],
+    [2, "North"],
+    [3, "East"]
 ]);

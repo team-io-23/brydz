@@ -72,8 +72,9 @@ function sendCards(socket: any) {
     const roomID = playerRooms.get(socket.id)!;
     const playerID = rooms.get(roomID)!.indexOf(socket.id);
     const dummyID = currentDummy.get(roomID)!;
+    const show = showDummy.get(roomID)!;
 
-    let hands = hideCards(currentHands.get(roomID)!, playerID, dummyID);
+    let hands = hideCards(currentHands.get(roomID)!, playerID, dummyID, show);
     socket.emit('hand-update', hands);
 }
 
