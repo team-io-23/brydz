@@ -1,7 +1,8 @@
 "use strict";
-// TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkCorrectBid = void 0;
+// TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
+var server_utils_1 = require("./server-utils");
 var io = require('socket.io')(8000, {
     cors: {
         origin: '*',
@@ -27,6 +28,51 @@ var currentTricks = new Map(); // roomID, played cards
 var currentTurns = new Map(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 var currentTrumps = new Map(); // roomID, trump suit
 var biddingHistory = new Map(); // roomID, bids
+var results = new Map(); // roomID, scores
+var currentHands = new Map(); // roomID, hands
+var currentDummy = new Map(); // roomID, dummy player
+var showDummy = new Map(); // roomID, show dummy cards
+function initRoom(roomID) {
+    rooms.set(roomID, []);
+    currentTricks.set(roomID, []);
+    currentTurns.set(roomID, 0);
+    currentTrumps.set(roomID, 'Spades'); // TODO - testing
+    biddingHistory.set(roomID, [ZERO_BID]);
+    results.set(roomID, { teamOne: 0, teamTwo: 0 });
+    currentHands.set(roomID, []);
+    currentDummy.set(roomID, -1);
+    showDummy.set(roomID, false);
+    dealCards(roomID);
+}
+function dealCards(roomID) {
+    var cards = shuffleArray(server_utils_1.allCards);
+    var hands = [[], [], [], []];
+    for (var i = 0; i < 52; i++) {
+        hands[i % 4].push(cards[i]);
+    }
+    currentHands.set(roomID, [
+        { cards: hands[0], player: 0 },
+        { cards: hands[1], player: 1 },
+        { cards: hands[2], player: 2 },
+        { cards: hands[3], player: 3 }
+    ]);
+}
+function sendCards(socket) {
+    var roomID = playerRooms.get(socket.id);
+    var playerID = rooms.get(roomID).indexOf(socket.id);
+    var dummyID = currentDummy.get(roomID);
+    var show = showDummy.get(roomID);
+    var hands = (0, server_utils_1.hideCards)(currentHands.get(roomID), playerID, dummyID, show);
+    socket.emit('hand-update', hands);
+}
+function shuffleArray(array) {
+    var _a;
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        _a = [array[j], array[i]], array[i] = _a[0], array[j] = _a[1];
+    }
+    return array;
+}
 function getWinner(roomID) {
     var trump = currentTrumps.get(roomID);
     var cards = currentTricks.get(roomID);
@@ -37,7 +83,6 @@ function getWinner(roomID) {
         if (highest !== undefined) {
             highestRank = cardValues.get(highest.rank);
         }
-        console.log(cards[i].rank + ' ' + cards[i].suit + ' ' + rank + ' ' + highestRank);
         if (highest === undefined) {
             // First card in a trick.
             highest = cards[i];
@@ -55,7 +100,6 @@ function getWinner(roomID) {
             }
         }
     }
-    console.log("Highest: " + cards.indexOf(highest));
     // We made it around the table - last player is saved in currentTurns now.
     // We need to add 1 mod 4 to get to the first player.
     var firstPlayer = (currentTurns.get(roomID) + 1) % 4;
@@ -72,8 +116,6 @@ function checkCorrectBid(bid, currentBid) {
     }
     var trumpValue = trumpValues.get(bid.trump);
     var currentTrumpValue = trumpValues.get(currentBid.trump);
-    console.log("Bid: " + bid.value + " " + bid.trump + " " + trumpValue);
-    console.log("Current Bid: " + currentBid.value + " " + currentBid.trump + " " + currentTrumpValue);
     if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
         return true;
     }
@@ -108,11 +150,7 @@ io.on('connection', function (socket) {
         if (rooms.get(currentRoomID) === undefined || rooms.get(currentRoomID).length === 4) {
             // Creating new room.
             currentRoomID++;
-            rooms.set(currentRoomID, []);
-            currentTricks.set(currentRoomID, []);
-            currentTurns.set(currentRoomID, 0);
-            currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
-            biddingHistory.set(currentRoomID, [ZERO_BID]);
+            initRoom(currentRoomID);
         }
         // Joining room.
         socket.join(currentRoomID);
@@ -136,30 +174,52 @@ io.on('connection', function (socket) {
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
-        console.log(rooms.get(roomID));
-        console.log(rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
-        io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
+        io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
-    socket.on('play-card', function (card) {
+    socket.on('play-card', function (played) {
+        // TODO - check for valid card.
+        var card = played.card;
+        var player = played.player;
         console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
         var roomID = playerRooms.get(socket.id);
-        var playerIndex = rooms.get(roomID).indexOf(socket.id);
         currentTricks.get(roomID).push(card);
         var currentSuit = currentTricks.get(roomID)[0].suit;
-        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
+        io.in(roomID).emit('card-played', card, currentSuit, player);
+        showDummy.set(roomID, true); // Dummy will be shown after the first card is played.
+        // Update hands
+        var hands = currentHands.get(roomID);
+        hands[player].cards = hands[player].cards.filter(function (c) { return c.rank !== card.rank || c.suit !== card.suit; });
+        currentHands.set(roomID, hands);
+        sendCards(socket);
         if (currentTricks.get(roomID).length === 4) {
             // Trick is over.
             var winnerIndex = getWinner(roomID);
             currentTricks.set(roomID, []);
             currentTurns.set(roomID, winnerIndex);
-            io.in(roomID).emit('trick-over', winnerIndex);
-            io.in(rooms.get(roomID)[winnerIndex]).emit('your-turn'); // Sending info to trick winner.
+            var newScore = void 0;
+            if (winnerIndex % 2 === 0) {
+                // Team 1 won the trick.
+                newScore = {
+                    'teamOne': results.get(roomID).teamOne + 1,
+                    'teamTwo': results.get(roomID).teamTwo
+                };
+            }
+            else {
+                // Team 2 won the trick.
+                newScore = {
+                    'teamOne': results.get(roomID).teamOne,
+                    'teamTwo': results.get(roomID).teamTwo + 1
+                };
+            }
+            results.set(roomID, newScore);
+            io.in(roomID).emit('trick-over', results.get(roomID));
+            io.in(roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
             return;
         }
         var currentTurn = (currentTurns.get(roomID) + 1) % 4;
         currentTurns.set(roomID, currentTurn);
-        io.in(rooms.get(roomID)[currentTurn]).emit('your-turn');
+        io.in(roomID).emit('set-turn', currentTurn);
     });
     socket.on('bid', function (bid) {
         // TODO - doubles/redoubles
@@ -174,10 +234,29 @@ io.on('connection', function (socket) {
         if (checkForThreePasses(roomID)) {
             // Bidding is over.
             console.log("Bidding over");
+            var declarer = (0, server_utils_1.findDeclarer)(biddingHistory.get(roomID));
+            currentDummy.set(roomID, (declarer + 2) % 4);
+            currentTurns.set(roomID, (declarer + 1) % 4); // Next player after declarer starts.
+            console.log("Declarer: " + declarer);
+            console.log("Dummy: " + currentDummy.get(roomID));
+            io.in(roomID).emit('set-turn', currentTurns.get(roomID));
             io.in(roomID).emit('bidding-over');
             return;
         }
         console.log("Bid made by: " + socket.id + " " + bid.value);
         io.in(roomID).emit('bid-made', bid);
+    });
+    socket.on('get-hands', function () {
+        sendCards(socket);
+    });
+    socket.on('get-dummy', function () {
+        var roomID = playerRooms.get(socket.id);
+        var dummyIndex = currentDummy.get(roomID);
+        socket.emit('dummy-info', dummyIndex);
+    });
+    socket.on('get-turn', function () {
+        var roomID = playerRooms.get(socket.id);
+        var turnIndex = currentTurns.get(roomID);
+        socket.emit('turn-info', turnIndex);
     });
 });

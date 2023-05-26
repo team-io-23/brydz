@@ -19,6 +19,15 @@
     transform: translateX(-50%)
 }
 
+.northHandDummy {
+    position: absolute;
+    top: 120px;
+    margin-top: -15px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%)
+}
+
 .southHand {
     position: absolute;
     left: 50%;

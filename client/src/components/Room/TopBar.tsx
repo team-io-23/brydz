@@ -1,11 +1,10 @@
 import CurrentScore from "./CurrentScore";
 import CurrentContract from "./CurrentContract";
 import './TopBar.css'
-import { Result } from "./Room";
-import { Contract } from "../../utils";
+import { Contract, Score } from "../../utils";
 
 interface Props {
-    result: Result;
+    result: Score;
     contract: Contract;
 }
 

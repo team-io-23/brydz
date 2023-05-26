@@ -8,6 +8,7 @@ import io from 'socket.io-client';
 import { SERVER } from '../config';
 import WaitingRoom from './WaitingRoom/WaitingRoom';
 import Bidding from './Bidding/Bidding';
+import { Hand } from '../utils';
 
 function App() {
   const theme = createTheme(); // TODO: Add custom theme
@@ -36,7 +37,6 @@ socket.on("connect", () => {
   console.log("Connected to server");
 });
 
-socket.on("your-turn", () => {
-  console.log("It's your turn!");
-  localStorage.setItem(`turn-${socket.id}`, "true");
+socket.on("set-turn", (turn: number) => {
+  localStorage.setItem(`turn-${socket.id}`, turn.toString());
 });
