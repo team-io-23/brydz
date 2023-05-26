@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.findDeclarer = exports.findLastLegitBid = exports.hideCards = exports.placeholderCard = exports.allCards = void 0;
+// TODO - ładniej to
 exports.allCards = [
     { suit: 'spades', rank: '2', symbol: '♠' },
     { suit: 'spades', rank: '3', symbol: '♠' },

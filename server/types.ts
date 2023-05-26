@@ -19,3 +19,8 @@ export interface Hand {
     cards: Array<Card>;
     player: number;
 }
+
+export interface PlayedCard {
+    card: Card;
+    player: number;
+}

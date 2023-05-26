@@ -1,6 +1,6 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 import { allCards, findDeclarer, findLastLegitBid, hideCards } from './server-utils';
-import { Bid, Card, Score, Hand } from './types';
+import { Bid, Card, Score, Hand, PlayedCard } from './types';
 
 const io = require('socket.io')(8000, {
     cors: {
@@ -217,25 +217,26 @@ io.on('connection', socket => {
         const roomID = playerRooms.get(socket.id)!;
 
         io.in(roomID).emit('started-game', rooms.get(roomID)!.map(id => nicknames.get(id)));
-        io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
 
 
-    socket.on('play-card', (card: Card) => {
+    socket.on('play-card', (played: PlayedCard) => {
         // TODO - check for valid card.
+        const card = played.card;
+        const player = played.player;
+
         console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
         const roomID = playerRooms.get(socket.id)!;
-        const playerIndex = rooms.get(roomID)!.indexOf(socket.id);
 
         currentTricks.get(roomID)!.push(card);
         const currentSuit = currentTricks.get(roomID)![0].suit;
-        io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
+        io.in(roomID).emit('card-played', card, currentSuit, player);
 
         showDummy.set(roomID, true); // Dummy will be shown after the first card is played.
         // Update hands
         let hands = currentHands.get(roomID)!;
-        hands[playerIndex].cards = hands[playerIndex].cards.filter(c => c.rank !== card.rank || c.suit !== card.suit);
+        hands[player].cards = hands[player].cards.filter(c => c.rank !== card.rank || c.suit !== card.suit);
         currentHands.set(roomID, hands);
         sendCards(socket);
 
@@ -264,13 +265,13 @@ io.on('connection', socket => {
             results.set(roomID, newScore);
             
             io.in(roomID).emit('trick-over', results.get(roomID));
-            io.in(rooms.get(roomID)![winnerIndex]).emit('your-turn'); // Sending info to trick winner.
+            io.in(roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
             return;
         }
 
         const currentTurn = (currentTurns.get(roomID)! + 1) % 4;
         currentTurns.set(roomID, currentTurn);
-        io.in(rooms.get(roomID)![currentTurn]).emit('your-turn');
+        io.in(roomID).emit('set-turn', currentTurn);
     });
 
 
@@ -293,11 +294,14 @@ io.on('connection', socket => {
             console.log("Bidding over");
             let declarer = findDeclarer(biddingHistory.get(roomID)!);
             currentDummy.set(roomID, (declarer + 2) % 4);
+            currentTurns.set(roomID, (declarer + 1) % 4);  // Next player after declarer starts.
 
-            //currentTurns.set(roomID, (declarer + 1) % 4); // TODO
             console.log("Declarer: " + declarer);
             console.log("Dummy: " + currentDummy.get(roomID));
+            
+            io.in(roomID).emit('set-turn', currentTurns.get(roomID));
             io.in(roomID).emit('bidding-over');
+
 
             return;
         }
@@ -315,5 +319,11 @@ io.on('connection', socket => {
         const roomID = playerRooms.get(socket.id)!;
         const dummyIndex = currentDummy.get(roomID)!;
         socket.emit('dummy-info', dummyIndex);
+    });
+
+    socket.on('get-turn', () => {
+        const roomID = playerRooms.get(socket.id)!;
+        const turnIndex = currentTurns.get(roomID)!;
+        socket.emit('turn-info', turnIndex);
     });
 });

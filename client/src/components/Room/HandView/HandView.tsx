@@ -13,17 +13,30 @@ interface HandViewProps {
 function HandView({ player, position, hand }: HandViewProps) {
     // TODO: Replace this with the actual hand.
 
+    // Seat - our actual seat, player - seat of the player whose hand we are viewing.
+    let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
+    let dummy = parseInt(localStorage.getItem(`dummy-${socket.id}`)!);
+
     function playCard(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+        if (seat == dummy) {
+            return;
+        }
+        
         let card = event.currentTarget.className;
         let cardRank = card.split(" ")[1].split("-")[1];
         let cardSuit = card.split(" ")[2];
-        let turn = localStorage.getItem(`turn-${socket.id}`) === "true";
+
+        let turn = parseInt(localStorage.getItem(`turn-${socket.id}`)!);
+
+        let isOurTurn = turn === seat;
+        let isDummyTurn = turn === dummy;
+        let canPlayFromDummy = (seat + 2) % 4 === dummy;
+        let canPlay = isOurTurn || (isDummyTurn && canPlayFromDummy);
+
         let currentSuit = localStorage.getItem(`suit-${socket.id}`)!;
 
-        if (!checkCorrectCard(hand.cards, cardSuit, currentSuit) || !turn) {
+        if (!checkCorrectCard(hand.cards, cardSuit, currentSuit) || !canPlay) {
             console.log("Illegal card! / Not your turn!");
-            console.log("Turn", turn);
-            console.log(checkCorrectCard(hand.cards, cardSuit, currentSuit));
             return;
         }
 
@@ -31,10 +44,9 @@ function HandView({ player, position, hand }: HandViewProps) {
             localStorage.setItem(`suit-${socket.id}`, cardSuit);
         }
 
-        localStorage.setItem(`turn-${socket.id}`, "false");
-
         // Symbol is not needed here, we can just keep it empty.
-        socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: '' });
+        let played: Card = { rank: cardRank, suit: cardSuit, symbol: '' }
+        socket.emit("play-card", {card: played, player: player});
     }
 
     function card(rank: string, suit: string, symbol: string) {
@@ -45,7 +57,6 @@ function HandView({ player, position, hand }: HandViewProps) {
             </a>
         )
     }
-
 
     function back() {
         return (

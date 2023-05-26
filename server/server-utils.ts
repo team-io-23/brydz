@@ -1,5 +1,6 @@
 import { Hand, Card, Bid } from './types';
 
+// TODO - ładniej to
 export const allCards = [
     { suit: 'spades', rank: '2', symbol:'♠' },
     { suit: 'spades', rank: '3', symbol:'♠' },

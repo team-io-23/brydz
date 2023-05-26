@@ -1,5 +1,4 @@
 import HandView from "./HandView/HandView";
-import { NorthHandView, WestHandView, EastHandView } from "./HandView/BackHandView";
 import TopBar from "./TopBar";
 import { socket } from "../App";
 import { Contract, Hand, Score, seats } from "../../utils";
@@ -44,6 +43,7 @@ function Room() {
 
     socket.on("dummy-info", (dummy: number) => {
         setDummy(dummy);
+        localStorage.setItem(`dummy-${socket.id}`, dummy.toString());
     });
 
     let contract:Contract = JSON.parse(localStorage.getItem(`contract-${socket.id}`)!);
@@ -51,8 +51,11 @@ function Room() {
 
     // TODO - połączyć w jedno
     function backHand(playerSeat: number) {
-        let direction = seats.get(playerSeat)!.toLowerCase() + "Hand";
-        if (playerSeat !== dummy && playerSeat !== seat) {
+        let relativeSeat = (playerSeat - seat + 4) % 4;
+        let direction = seats.get(relativeSeat)!.toLowerCase() + "Hand";
+        let declarer = (dummy + 2) % 4;
+
+        if (playerSeat !== seat && (playerSeat !== dummy || (playerSeat === dummy && seat !== declarer))) {
             return (
                 <HandView player={playerSeat} position={direction} hand={hands[playerSeat]}/>
             )
@@ -60,10 +63,15 @@ function Room() {
     }
 
     function frontHand(playerSeat: number) {
-        let direction = seats.get(playerSeat)!.toLowerCase() + "Hand";
-        if (playerSeat === dummy || playerSeat === seat) {
+        let declarer = (dummy + 2) % 4;
+
+        if (playerSeat === dummy && seat === declarer) {
             return (
-                <HandView player={playerSeat} position={direction} hand={hands[playerSeat]}/>
+                <HandView player={playerSeat} position='northHandDummy' hand={hands[playerSeat]}/>
+            )
+        } else if (playerSeat === seat) {
+            return (
+                <HandView player={playerSeat} position='southHand' hand={hands[playerSeat]}/>
             )
         }
     }
@@ -74,13 +82,13 @@ function Room() {
                 <TopBar result={result} contract={contract}/>
                 <div className="play-table">
                     {hands.map((sth, index) => 
-                        backHand((seat + index) % 4)
+                        backHand(index)
                     )}
                     <PlayedCards />
                 </div>
 
                 {hands.map((sth, index) => 
-                    frontHand((seat + index) % 4)
+                    frontHand(index)
                 )}
                 
             </div>
