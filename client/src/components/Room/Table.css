@@ -1,9 +1,9 @@
-.table1 {
-    width: 815px;
+.play-table {
+    width: 1050px;
     height: 615px;
     background-color: #4aad4a;
     position: absolute;
-    top: 450px;
+    top: 400px;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
     border-radius: 150px;
@@ -13,11 +13,11 @@
 
 }
 
-.table1::before {
+.play-table::before {
     content: '';
     border: 7px solid rgba(0, 0, 0, .1);
     display: block;
-    width: 815px;
+    width: 1050px;
     height: 615px;
     border-radius: 150px;
     position: absolute;
@@ -25,11 +25,11 @@
     left: -15px;
 }
 
-.table1:after {
+.play-table::after {
     content: '';
     border: 7px solid rgba(0, 0, 0, .1);
     display: block;
-    width: 785px;
+    width: 1020px;
     height: 585px;
     border-radius: 130px;
     position: absolute;

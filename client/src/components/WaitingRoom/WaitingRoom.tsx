@@ -12,12 +12,16 @@ function WaitingRoom() {
         setPlayersInRoom(players);
     });
 
-    socket.on("started-game", () => {
+    socket.on("started-game", (players: Array<string>) => {
         console.log("Started game");
+        setPlayersInRoom(players);
         let nickname = localStorage.getItem(`nickname-${socket.id}`)!;
+        console.log("nickname: " + nickname);
+        console.log("players: " + playersInRoom);
         localStorage.setItem(`players-${socket.id}`, playersInRoom.toString());
         localStorage.setItem(`seat-${socket.id}`, playersInRoom.indexOf(nickname).toString());
-        localStorage.setItem(`bid-${socket.id}`, ZERO_BID);
+        localStorage.setItem(`bid-turn-${socket.id}`, "0"); // TODO - randomize, 0 for testing purposes
+        localStorage.setItem(`bid-history-${socket.id}`, JSON.stringify([[ZERO_BID]]));
         navigate("/bidding");
     });
 

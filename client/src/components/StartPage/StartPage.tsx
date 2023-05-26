@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './StartPage.css';
 import TextField from '@mui/material/TextField';
@@ -28,6 +28,8 @@ function StartPage() {
 
     function JoinButton() {
         function handleJoin(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+            console.log(socket.id);
+            console.log("Setting nickname: " + nickname);
             localStorage.setItem(`nickname-${socket.id}`, nickname);
 
             socket.emit("joining-room", nickname);

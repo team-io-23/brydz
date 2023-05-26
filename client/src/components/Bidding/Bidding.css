@@ -5,7 +5,11 @@
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
+    font-size: 20px;
+    height: 10%;
+    width: 20%;
+    padding: 20px;
+    border: 1px solid #000000;
 }
 
 .button.clubs {
@@ -30,4 +34,16 @@
 
 .button.no-trumps {
     background-color: #808080; /* Gray */
+}
+
+.bidding {
+
+}
+
+.bidding-options {
+    position: absolute;
+    top: 15%;
+    left: 25%;
+    width: 40%;
+    padding: 30px;
 }

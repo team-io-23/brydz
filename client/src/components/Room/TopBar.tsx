@@ -2,11 +2,11 @@ import CurrentScore from "./CurrentScore";
 import CurrentContract from "./CurrentContract";
 import './TopBar.css'
 import { Result } from "./Room";
-import { Bid } from "../../utils";
+import { Contract } from "../../utils";
 
 interface Props {
     result: Result;
-    contract: Bid;
+    contract: Contract;
 }
 
 function TopBar(props: Props) {

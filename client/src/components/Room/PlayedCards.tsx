@@ -26,11 +26,10 @@ function PlayedCards() {
     }
 
     socket.on("card-played", (card: Card, currentSuit: string, playedBy: number) => {
-        // TODO: Do stuff when someone plays a card.
         console.log("Current suit: " + currentSuit);
         console.log("Player number " + playedBy + " played card: " + card.rank + " of " + card.suit);
         localStorage.setItem(`suit-${socket.id}`, currentSuit);
-        localStorage.setItem(`playedBy-${socket.id}` + playedBy, JSON.stringify(card));
+        localStorage.setItem(`nextPlayer-${socket.id}`, ((playedBy + 1) % 4).toString());
         playCard(card, playedBy);
     });
 

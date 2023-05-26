@@ -49,12 +49,13 @@ function HandView() {
             localStorage.setItem(`suit-${socket.id}`, cardSuit);
         }
 
+        localStorage.setItem(`turn-${socket.id}`, "false");
+
         // Symbol is not needed here, we can just keep it empty.
         socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: symbols[cardSuit] });
         console.log("Played " + cardRank + " of " + cardSuit);
         // Remove card from hand
         setHand(hand.filter((card) => card.rank !== cardRank || card.suit !== cardSuit));
-        localStorage.setItem(`turn-${socket.id}`, "false");
     }
 
     return (

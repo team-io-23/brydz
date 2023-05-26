@@ -1,4 +1,7 @@
+"use strict";
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.checkCorrectBid = void 0;
 var io = require('socket.io')(8000, {
     cors: {
         origin: '*',
@@ -8,6 +11,14 @@ var cardValues = new Map([
     ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
     ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
 ]);
+var trumpValues = new Map([
+    ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
+]);
+var ZERO_BID = {
+    value: '0',
+    trump: 'none',
+    bidder: -1
+};
 var playerRooms = new Map();
 var rooms = new Map();
 var nicknames = new Map(); // socket.id, nickname
@@ -51,6 +62,26 @@ function getWinner(roomID) {
     var winner = (firstPlayer + cards.indexOf(highest)) % 4;
     return winner;
 }
+function checkCorrectBid(bid, currentBid) {
+    // TODO - doubles and redoubles
+    if (bid === undefined || currentBid === undefined) {
+        return false;
+    }
+    if (bid.value === "pass") {
+        return true;
+    }
+    var trumpValue = trumpValues.get(bid.trump);
+    var currentTrumpValue = trumpValues.get(currentBid.trump);
+    console.log("Bid: " + bid.value + " " + bid.trump + " " + trumpValue);
+    console.log("Current Bid: " + currentBid.value + " " + currentBid.trump + " " + currentTrumpValue);
+    if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+exports.checkCorrectBid = checkCorrectBid;
 function checkForThreePasses(roomID) {
     var bids = biddingHistory.get(roomID);
     if (bids.length < 3) {
@@ -81,7 +112,7 @@ io.on('connection', function (socket) {
             currentTricks.set(currentRoomID, []);
             currentTurns.set(currentRoomID, 0);
             currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
-            biddingHistory.set(currentRoomID, []);
+            biddingHistory.set(currentRoomID, [ZERO_BID]);
         }
         // Joining room.
         socket.join(currentRoomID);
@@ -105,7 +136,9 @@ io.on('connection', function (socket) {
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
-        io.in(roomID).emit('started-game');
+        console.log(rooms.get(roomID));
+        console.log(rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
+        io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(socket.id).emit('your-turn'); // TODO - should be decided based on bidding.
     });
     socket.on('play-card', function (card) {
@@ -129,16 +162,22 @@ io.on('connection', function (socket) {
         io.in(rooms.get(roomID)[currentTurn]).emit('your-turn');
     });
     socket.on('bid', function (bid) {
-        // TODO - add 4 passes check
         // TODO - doubles/redoubles
         var roomID = playerRooms.get(socket.id);
+        var lastBid = biddingHistory.get(roomID)[biddingHistory.get(roomID).length - 1];
+        if (!checkCorrectBid(bid, lastBid)) {
+            console.log("Illegal bid / Not your turn!");
+            return;
+        } // TODO - testing, add turn check later
         biddingHistory.get(roomID).push(bid);
+        console.log(biddingHistory);
         if (checkForThreePasses(roomID)) {
             // Bidding is over.
             console.log("Bidding over");
             io.in(roomID).emit('bidding-over');
             return;
         }
+        console.log("Bid made by: " + socket.id + " " + bid.value);
         io.in(roomID).emit('bid-made', bid);
     });
 });
