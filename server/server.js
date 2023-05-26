@@ -106,17 +106,18 @@ function getWinner(roomID) {
     var winner = (firstPlayer + cards.indexOf(highest)) % 4;
     return winner;
 }
-function checkCorrectBid(bid, currentBid) {
+function checkCorrectBid(bid, lastBid, lastLegitBid) {
     // TODO - doubles and redoubles
-    if (bid === undefined || currentBid === undefined) {
+    // TODO - lastBid will be used to check for turn order
+    if (bid === undefined || lastBid === undefined) {
         return false;
     }
     if (bid.value === "pass") {
         return true;
     }
     var trumpValue = trumpValues.get(bid.trump);
-    var currentTrumpValue = trumpValues.get(currentBid.trump);
-    if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
+    var currentTrumpValue = trumpValues.get(lastLegitBid.trump);
+    if (bid.value > lastLegitBid.value || (bid.value === lastLegitBid.value && trumpValue > currentTrumpValue)) {
         return true;
     }
     else {
@@ -224,8 +225,9 @@ io.on('connection', function (socket) {
     socket.on('bid', function (bid) {
         // TODO - doubles/redoubles
         var roomID = playerRooms.get(socket.id);
+        var lastLegitBid = (0, server_utils_1.findLastLegitBid)(biddingHistory.get(roomID));
         var lastBid = biddingHistory.get(roomID)[biddingHistory.get(roomID).length - 1];
-        if (!checkCorrectBid(bid, lastBid)) {
+        if (!checkCorrectBid(bid, lastBid, lastLegitBid)) {
             console.log("Illegal bid / Not your turn!");
             return;
         } // TODO - testing, add turn check later

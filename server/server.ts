@@ -127,9 +127,10 @@ function getWinner(roomID: number) {
 }
 
 
-export function checkCorrectBid(bid: Bid, currentBid: Bid) {
+export function checkCorrectBid(bid: Bid, lastBid: Bid, lastLegitBid: Bid) {
     // TODO - doubles and redoubles
-    if (bid === undefined || currentBid === undefined) {
+    // TODO - lastBid will be used to check for turn order
+    if (bid === undefined || lastBid === undefined) {
         return false;
     }
 
@@ -138,10 +139,10 @@ export function checkCorrectBid(bid: Bid, currentBid: Bid) {
     }
 
     let trumpValue = trumpValues.get(bid.trump)!;
-    let currentTrumpValue = trumpValues.get(currentBid.trump)!;
+    let currentTrumpValue = trumpValues.get(lastLegitBid.trump)!;
 
 
-    if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
+    if (bid.value > lastLegitBid.value || (bid.value === lastLegitBid.value && trumpValue > currentTrumpValue)) {
         return true;
     } else {
         return false;
@@ -278,9 +279,10 @@ io.on('connection', socket => {
     socket.on('bid', (bid: Bid) => {
         // TODO - doubles/redoubles
         const roomID = playerRooms.get(socket.id)!;
+        const lastLegitBid = findLastLegitBid(biddingHistory.get(roomID)!);
         const lastBid = biddingHistory.get(roomID)![biddingHistory.get(roomID)!.length - 1];
 
-        if (!checkCorrectBid(bid, lastBid)) {
+        if (!checkCorrectBid(bid, lastBid, lastLegitBid)) {
             console.log("Illegal bid / Not your turn!");
             return;
         } // TODO - testing, add turn check later
