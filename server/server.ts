@@ -18,6 +18,16 @@ interface Bid {
     bidder: number;
 }
 
+interface Score {
+    teamOne: number;
+    teamTwo: number;
+}
+
+interface Hand {
+    cards: Array<Card>;
+    player: number;
+}
+
 const cardValues = new Map<string, number>([
     ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
     ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
@@ -41,6 +51,18 @@ let currentTricks = new Map<number, Card[]>(); // roomID, played cards
 let currentTurns = new Map<number, number>(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 let currentTrumps = new Map<number, string>(); // roomID, trump suit
 let biddingHistory = new Map<number, Bid[]>(); // roomID, bids
+let results = new Map<number, Score>(); // roomID, scores\
+let currentHands = new Map<number, Hand[]>(); // roomID, hands
+
+function initRoom(roomID: number) {
+    rooms.set(roomID, []);
+    currentTricks.set(roomID, []);
+    currentTurns.set(roomID, 0);
+    currentTrumps.set(roomID, 'Spades'); // TODO - testing
+    biddingHistory.set(roomID, [ZERO_BID]);
+    results.set(roomID, {teamOne: 0, teamTwo: 0});
+    currentHands.set(roomID, []);
+}
 
 function getWinner(roomID: number) {
     let trump = currentTrumps.get(roomID)!;
@@ -141,11 +163,7 @@ io.on('connection', socket => {
         if (rooms.get(currentRoomID) === undefined || rooms.get(currentRoomID)!.length === 4) {
             // Creating new room.
             currentRoomID++;
-            rooms.set(currentRoomID, []);
-            currentTricks.set(currentRoomID, []);
-            currentTurns.set(currentRoomID, 0);
-            currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
-            biddingHistory.set(currentRoomID, [ZERO_BID]);
+            initRoom(currentRoomID);
         }
 
         // Joining room.
@@ -194,13 +212,37 @@ io.on('connection', socket => {
         const currentSuit = currentTricks.get(roomID)![0].suit;
         io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
 
+        // Update hands
+        let hands = currentHands.get(roomID)!;
+        hands[playerIndex].cards = hands[playerIndex].cards.filter(c => c.rank !== card.rank || c.suit !== card.suit);
+        currentHands.set(roomID, hands);
+        io.in(roomID).emit('hand-update', hands);
+
         if (currentTricks.get(roomID)!.length === 4) {
             // Trick is over.
             let winnerIndex = getWinner(roomID);
             currentTricks.set(roomID, []);
             currentTurns.set(roomID, winnerIndex);
+
+            let newScore: Score;
+
+            if (winnerIndex % 2 === 0) {
+                // Team 1 won the trick.
+                newScore = {
+                    'teamOne': results.get(roomID)!.teamOne + 1, 
+                    'teamTwo': results.get(roomID)!.teamTwo
+                };
+            } else {
+                // Team 2 won the trick.
+                newScore = {
+                    'teamOne': results.get(roomID)!.teamOne,
+                    'teamTwo': results.get(roomID)!.teamTwo + 1
+                };
+            }
+
+            results.set(roomID, newScore);
             
-            io.in(roomID).emit('trick-over', winnerIndex);
+            io.in(roomID).emit('trick-over', results.get(roomID));
             io.in(rooms.get(roomID)![winnerIndex]).emit('your-turn'); // Sending info to trick winner.
             return;
         }
@@ -208,7 +250,6 @@ io.on('connection', socket => {
         const currentTurn = (currentTurns.get(roomID)! + 1) % 4;
         currentTurns.set(roomID, currentTurn);
         io.in(rooms.get(roomID)![currentTurn]).emit('your-turn');
-
     });
 
 

@@ -18,6 +18,18 @@ export interface Bid {
     bidder: number;
 }
 
+
+export interface Hand {
+    cards: Array<Card>;
+    player: number;
+}
+
+
+export interface Score {
+    teamOne: number;
+    teamTwo: number;
+}
+
 // Returns a boolean value if the card is a legal card to play or not.
 export function checkCorrectCard(playerCards: Array<Card>, cardSuit: string, playingSuit: string) {
     if (playingSuit === "" || playingSuit === cardSuit) {

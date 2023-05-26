@@ -27,6 +27,15 @@ var currentTricks = new Map(); // roomID, played cards
 var currentTurns = new Map(); // roomID, 0 - North, 1 - East, 2 - South, 3 - West
 var currentTrumps = new Map(); // roomID, trump suit
 var biddingHistory = new Map(); // roomID, bids
+var results = new Map(); // roomID, scores
+function initRoom(roomID) {
+    rooms.set(roomID, []);
+    currentTricks.set(roomID, []);
+    currentTurns.set(roomID, 0);
+    currentTrumps.set(roomID, 'Spades'); // TODO - testing
+    biddingHistory.set(roomID, [ZERO_BID]);
+    results.set(roomID, { teamOne: 0, teamTwo: 0 });
+}
 function getWinner(roomID) {
     var trump = currentTrumps.get(roomID);
     var cards = currentTricks.get(roomID);
@@ -108,11 +117,7 @@ io.on('connection', function (socket) {
         if (rooms.get(currentRoomID) === undefined || rooms.get(currentRoomID).length === 4) {
             // Creating new room.
             currentRoomID++;
-            rooms.set(currentRoomID, []);
-            currentTricks.set(currentRoomID, []);
-            currentTurns.set(currentRoomID, 0);
-            currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
-            biddingHistory.set(currentRoomID, [ZERO_BID]);
+            initRoom(currentRoomID);
         }
         // Joining room.
         socket.join(currentRoomID);
@@ -153,7 +158,23 @@ io.on('connection', function (socket) {
             var winnerIndex = getWinner(roomID);
             currentTricks.set(roomID, []);
             currentTurns.set(roomID, winnerIndex);
-            io.in(roomID).emit('trick-over', winnerIndex);
+            var newScore = void 0;
+            if (winnerIndex % 2 === 0) {
+                // Team 1 won the trick.
+                newScore = {
+                    'teamOne': results.get(roomID).teamOne + 1,
+                    'teamTwo': results.get(roomID).teamTwo
+                };
+            }
+            else {
+                // Team 2 won the trick.
+                newScore = {
+                    'teamOne': results.get(roomID).teamOne,
+                    'teamTwo': results.get(roomID).teamTwo + 1
+                };
+            }
+            results.set(roomID, newScore);
+            io.in(roomID).emit('trick-over', results.get(roomID));
             io.in(rooms.get(roomID)[winnerIndex]).emit('your-turn'); // Sending info to trick winner.
             return;
         }
