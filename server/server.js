@@ -31,6 +31,7 @@ var biddingHistory = new Map(); // roomID, bids
 var results = new Map(); // roomID, scores
 var currentHands = new Map(); // roomID, hands
 var currentDummy = new Map(); // roomID, dummy player
+var showDummy = new Map(); // roomID, show dummy cards
 function initRoom(roomID) {
     rooms.set(roomID, []);
     currentTricks.set(roomID, []);
@@ -40,6 +41,7 @@ function initRoom(roomID) {
     results.set(roomID, { teamOne: 0, teamTwo: 0 });
     currentHands.set(roomID, []);
     currentDummy.set(roomID, -1);
+    showDummy.set(roomID, false);
     dealCards(roomID);
 }
 function dealCards(roomID) {
@@ -176,12 +178,14 @@ io.on('connection', function (socket) {
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
     socket.on('play-card', function (card) {
+        // TODO - check for valid card.
         console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
         var roomID = playerRooms.get(socket.id);
         var playerIndex = rooms.get(roomID).indexOf(socket.id);
         currentTricks.get(roomID).push(card);
         var currentSuit = currentTricks.get(roomID)[0].suit;
         io.in(roomID).emit('card-played', card, currentSuit, playerIndex);
+        showDummy.set(roomID, true); // Dummy will be shown after the first card is played.
         // Update hands
         var hands = currentHands.get(roomID);
         hands[playerIndex].cards = hands[playerIndex].cards.filter(function (c) { return c.rank !== card.rank || c.suit !== card.suit; });
@@ -242,5 +246,10 @@ io.on('connection', function (socket) {
     });
     socket.on('get-hands', function () {
         sendCards(socket);
+    });
+    socket.on('get-dummy', function () {
+        var roomID = playerRooms.get(socket.id);
+        var dummyIndex = currentDummy.get(roomID);
+        socket.emit('dummy-info', dummyIndex);
     });
 });

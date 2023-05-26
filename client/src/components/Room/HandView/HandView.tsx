@@ -37,16 +37,29 @@ function HandView({ player, position, hand }: HandViewProps) {
         socket.emit("play-card", { rank: cardRank, suit: cardSuit, symbol: '' });
     }
 
+    function card(rank: string, suit: string, symbol: string) {
+        return (
+            <a className={`card rank-${rank} ${suit} myAllCards`} onClick={playCard}>
+                <span className="rank">{rank.toUpperCase()}</span>
+                <span className="suit">{symbol}</span>
+            </a>
+        )
+    }
+
+
+    function back() {
+        return (
+            <a className="card back"></a>
+        )
+    }
+
     return (
-        <div className="southHand">
+        <div className={position}>
             <div className="playingCards faceImages">
                 <ul className="table">
-                    {hand.cards.map(({ rank, suit, symbol }) => (
-                        <li key={rank + suit}>
-                            <a className={`card rank-${rank} ${suit} myAllCards`} onClick={playCard}>
-                                <span className="rank">{rank.toUpperCase()}</span>
-                                <span className="suit">{symbol}</span>
-                            </a>
+                    {hand.cards.map(({ rank, suit, symbol }, index) => (
+                        <li key={index}>
+                            {rank == 'none' ? back() : card(rank, suit, symbol)}
                         </li>
                     ))}
                 </ul>

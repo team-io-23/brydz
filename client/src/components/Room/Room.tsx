@@ -2,7 +2,7 @@ import HandView from "./HandView/HandView";
 import { NorthHandView, WestHandView, EastHandView } from "./HandView/BackHandView";
 import TopBar from "./TopBar";
 import { socket } from "../App";
-import { Contract, Hand, Score } from "../../utils";
+import { Contract, Hand, Score, seats } from "../../utils";
 import { useEffect, useState } from "react";
 import PlayedCards from "./PlayedCards";
 import BiddingHistory from "../Bidding/BiddingHistory";
@@ -19,9 +19,11 @@ function Room() {
         { cards: [], player: 2 },
         { cards: [], player: 3 },
     ]);
+    let [dummy, setDummy] = useState<number>(-1);
 
     useEffect(() => {
         socket.emit("get-hands");
+        socket.emit("get-dummy");
         console.log("Getting hands");
     }, []);
 
@@ -40,20 +42,47 @@ function Room() {
         console.log(hands);
     }); 
 
+    socket.on("dummy-info", (dummy: number) => {
+        setDummy(dummy);
+    });
+
     let contract:Contract = JSON.parse(localStorage.getItem(`contract-${socket.id}`)!);
     let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
+
+    // TODO - połączyć w jedno
+    function backHand(playerSeat: number) {
+        let direction = seats.get(playerSeat)!.toLowerCase() + "Hand";
+        if (playerSeat !== dummy && playerSeat !== seat) {
+            return (
+                <HandView player={playerSeat} position={direction} hand={hands[playerSeat]}/>
+            )
+        }
+    }
+
+    function frontHand(playerSeat: number) {
+        let direction = seats.get(playerSeat)!.toLowerCase() + "Hand";
+        if (playerSeat === dummy || playerSeat === seat) {
+            return (
+                <HandView player={playerSeat} position={direction} hand={hands[playerSeat]}/>
+            )
+        }
+    }
 
     return (
         <div>
             <div className="play-area-container">
                 <TopBar result={result} contract={contract}/>
                 <div className="play-table">
-                    <NorthHandView />
-                    <WestHandView />
-                    <EastHandView />
+                    {hands.map((sth, index) => 
+                        backHand(index)
+                    )}
                     <PlayedCards />
                 </div>
-                <HandView player={seat} position={'southHand'} hand={hands[0]}/>
+
+                {hands.map((sth, index) => 
+                    frontHand(index)
+                )}
+                
             </div>
             <BiddingHistory />
         </div>
