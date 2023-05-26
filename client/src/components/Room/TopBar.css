@@ -3,7 +3,7 @@
     flex-direction: row;
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
     font-size: 16px;
     font-weight: 600;
@@ -17,8 +17,6 @@
     padding: 10px;
     height: 70px;
     align-items: center;
-
-    margin: auto;
 }
 
 .info-box.left {

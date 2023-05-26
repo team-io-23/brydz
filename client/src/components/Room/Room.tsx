@@ -1,12 +1,14 @@
 import { HandView, NorthHandView, WestHandView, EastHandView } from "./HandView";
-import Table from "./Table";
 import TopBar from "./TopBar";
 import { socket } from "../App";
 import { Contract } from "../../utils";
 import { useState } from "react";
 import PlayedCards from "./PlayedCards";
-import { json } from "stream/consumers";
-import { BindingOrAssignmentElement } from "typescript";
+import BiddingHistory from "../Bidding/BiddingHistory";
+import NextPlayerIndicator from "./NextPlayerIndicator"; // TODO - coś jest bardzo spierdolone z tym
+
+import "./Room.css";
+import "./Table.css";
 
 // Team one - players 0 and 2, team two - players 1 and 3.
 export interface Result {
@@ -37,13 +39,17 @@ function Room() {
 
     return (
         <div>
-            <TopBar result={result} contract={contract}/>
-            <NorthHandView />
-            <WestHandView />
-            <EastHandView />
-            <Table />
-            <PlayedCards />
-            <HandView />
+            <div className="play-area-container">
+                <TopBar result={result} contract={contract}/>
+                <div className="play-table">
+                    <NorthHandView />
+                    <WestHandView />
+                    <EastHandView />
+                    <PlayedCards />
+                </div>
+                <HandView />
+            </div>
+            <BiddingHistory />
         </div>
     )
 }

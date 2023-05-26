@@ -27,6 +27,12 @@ const trumpValues = new Map<string, number>([
     ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
 ]);
 
+const ZERO_BID: Bid = {
+    value: '0',
+    trump: 'none',
+    bidder: -1
+}
+
 const playerRooms = new Map<string, number>();
 const rooms = new Map<number, string[]>();
 const nicknames = new Map<string, string>(); // socket.id, nickname
@@ -139,7 +145,7 @@ io.on('connection', socket => {
             currentTricks.set(currentRoomID, []);
             currentTurns.set(currentRoomID, 0);
             currentTrumps.set(currentRoomID, 'Spades'); // TODO - testing
-            biddingHistory.set(currentRoomID, []);
+            biddingHistory.set(currentRoomID, [ZERO_BID]);
         }
 
         // Joining room.
@@ -217,6 +223,8 @@ io.on('connection', socket => {
         } // TODO - testing, add turn check later
 
         biddingHistory.get(roomID)!.push(bid);
+
+        console.log(biddingHistory);
 
         if (checkForThreePasses(roomID)) {
             // Bidding is over.

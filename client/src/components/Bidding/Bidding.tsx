@@ -8,6 +8,9 @@ import { useEffect, useState } from "react";
 import CurrentBidder from "./CurrentBidder";
 import BiddingHistory from "./BiddingHistory";
 
+import "./Bidding.css";
+import "../Room/TopBar.css";
+
 // TODO: testing html
 function Bidding () {
     let biddingOptions = BiddingOptions();
@@ -33,10 +36,15 @@ function Bidding () {
         // Setting current turn.
         localStorage.setItem(`bid-turn-${socket.id}`, ((bid.bidder + 1) % 4).toString());
         
-        let bidHistory:Array<Bid> = JSON.parse(localStorage.getItem(`bid-history-${socket.id}`)!);
+        let bidHistory:Array<Array<Bid>> = JSON.parse(localStorage.getItem(`bid-history-${socket.id}`)!);
         console.log(bidHistory);
 
-        bidHistory.push(bid);
+        // New bidding round.
+        if (bid.bidder == 0 || bidHistory.length == 1) { // TODO - 1 is because of the zero bid placeholder.
+            bidHistory.push([]);
+        }
+
+        bidHistory[bidHistory.length - 1].push(bid);
         localStorage.setItem(`bid-history-${socket.id}`, JSON.stringify(bidHistory));
     }, [bid]);
 

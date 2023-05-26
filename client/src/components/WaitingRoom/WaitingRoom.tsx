@@ -21,7 +21,7 @@ function WaitingRoom() {
         localStorage.setItem(`players-${socket.id}`, playersInRoom.toString());
         localStorage.setItem(`seat-${socket.id}`, playersInRoom.indexOf(nickname).toString());
         localStorage.setItem(`bid-turn-${socket.id}`, "0"); // TODO - randomize, 0 for testing purposes
-        localStorage.setItem(`bid-history-${socket.id}`, JSON.stringify([ZERO_BID]));
+        localStorage.setItem(`bid-history-${socket.id}`, JSON.stringify([[ZERO_BID]]));
         navigate("/bidding");
     });
 

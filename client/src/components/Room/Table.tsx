@@ -1,8 +1,8 @@
-import './table.css';
+import './Table.css';
 
 function Table() {
     return (
-        <div className="table1">
+        <div className="play-table">
         </div>
     )
 }

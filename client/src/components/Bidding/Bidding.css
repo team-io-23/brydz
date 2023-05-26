@@ -43,39 +43,7 @@
 .bidding-options {
     position: absolute;
     top: 15%;
-    left: 30%;
+    left: 25%;
     width: 40%;
     padding: 30px;
-}
-
-.top-container {
-    display: flex;
-    flex-direction: row;
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-}
-
-
-.info-box {
-    display: flex;
-    flex-direction: row;
-    background-color: #0A66C2;
-    padding: 10px;
-    height: 70px;
-    align-items: center;
-
-    margin: auto;
-}
-
-.info-box.left {
-    border-radius: 30px 0px 0px 30px;
-}
-
-.info-box.right {
-    border-radius: 0px 30px 30px 0px;
 }
