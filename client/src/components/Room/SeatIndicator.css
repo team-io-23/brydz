@@ -21,12 +21,12 @@
 
 .west {
     top: 48%;
-    left: 10%;
+    left: 13%;
 }
 
 .east {
     top: 48%;
-    left: 89%;
+    left: 86%;
 }
 
 .north.close {
@@ -40,11 +40,11 @@
 }
 
 .west.close {
-    top: 48%;
+    top: 46%;
     left: 2%;
 }
 
 .east.close {
-    top: 48%;
+    top: 46%;
     left: 92%;
 }
