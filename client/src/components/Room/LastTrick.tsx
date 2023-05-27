@@ -1,4 +1,4 @@
-import { Trick } from '../../utils';
+import { Trick, arr } from '../../utils';
 import { socket } from '../App';
 import SeatIndicator from './SeatIndicator';
 
@@ -10,7 +10,6 @@ interface LastTrickProps {
 
 function LastTrick(props: LastTrickProps) {
     let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
-    const spots = [0, 1, 2, 3]; // Fake array to map over
 
     return (
         <div className="lastTrick">
@@ -27,7 +26,7 @@ function LastTrick(props: LastTrickProps) {
                 ))}
             </div>
 
-            {spots.map((sth, index) => 
+            {arr.map((sth, index) => 
                 <SeatIndicator seat={index} relative={(index - seat + 4) % 4} close={true}/>
             )}
         </div>

@@ -25,6 +25,7 @@ var results = new Map(); // roomID, scores
 var currentHands = new Map(); // roomID, hands
 var currentDummy = new Map(); // roomID, dummy player
 var showDummy = new Map(); // roomID, show dummy cards
+var currentSeats = new Map(); // roomID, seats
 function initRoom(roomID) {
     rooms.set(roomID, []);
     currentTricks.set(roomID, []);
@@ -35,6 +36,7 @@ function initRoom(roomID) {
     currentHands.set(roomID, []);
     currentDummy.set(roomID, -1);
     showDummy.set(roomID, false);
+    currentSeats.set(roomID, [-1, -1, -1, -1]);
     dealCards(roomID);
 }
 function dealCards(roomID) {
@@ -170,13 +172,37 @@ io.on('connection', function (socket) {
         playerRooms.delete(socket.id);
         io.in(roomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
     });
+    socket.on('choose-seat', function (seat) {
+        var roomID = playerRooms.get(socket.id);
+        var playerID = rooms.get(roomID).indexOf(socket.id);
+        var seats = currentSeats.get(roomID);
+        if (seats.includes(playerID) || seats[seat] !== -1) {
+            // Player is already in seat or seat is taken.
+            return;
+        }
+        seats[seat] = playerID;
+        currentSeats.set(roomID, seats);
+        io.in(roomID).emit('seat-change', seats);
+    });
+    socket.on('leave-seat', function () {
+        var roomID = playerRooms.get(socket.id);
+        var playerID = rooms.get(roomID).indexOf(socket.id);
+        var seats = currentSeats.get(roomID);
+        if (!seats.includes(playerID)) {
+            // Player is not in a seat.
+            return;
+        }
+        seats[seats.indexOf(playerID)] = -1;
+        currentSeats.set(roomID, seats);
+        io.in(roomID).emit('seat-change', seats);
+    });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
         io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
     socket.on('play-card', function (played) {
-        // TODO - check for valid card.
+        // TODO - check for valid card and turn order
         var card = played.card;
         var player = played.player;
         console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);

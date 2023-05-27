@@ -26,6 +26,7 @@ let results = new Map<number, Score>(); // roomID, scores
 let currentHands = new Map<number, Hand[]>(); // roomID, hands
 let currentDummy = new Map<number, number>(); // roomID, dummy player
 let showDummy = new Map<number, boolean>(); // roomID, show dummy cards
+let currentSeats = new Map<number, number[]>(); // roomID, seats
 
 function initRoom(roomID: number) {
     rooms.set(roomID, []);
@@ -37,6 +38,7 @@ function initRoom(roomID: number) {
     currentHands.set(roomID, []);
     currentDummy.set(roomID, -1);
     showDummy.set(roomID, false);
+    currentSeats.set(roomID, [-1, -1, -1, -1]);
     dealCards(roomID);
 }
 
@@ -206,6 +208,40 @@ io.on('connection', socket => {
         playerRooms.delete(socket.id);
 
         io.in(roomID).emit('player-change', rooms.get(currentRoomID)!.map(id => nicknames.get(id)));
+    });
+
+
+    socket.on('choose-seat', seat => {
+        const roomID = playerRooms.get(socket.id)!;
+        const playerID = rooms.get(roomID)!.indexOf(socket.id);
+        const seats = currentSeats.get(roomID)!;
+        
+        if(seats.includes(playerID) || seats[seat] !== -1) {
+            // Player is already in seat or seat is taken.
+            return;
+        }
+
+        seats[seat] = playerID;
+        currentSeats.set(roomID, seats);
+
+        io.in(roomID).emit('seat-change', seats);
+    });
+
+
+    socket.on('leave-seat', () => {
+        const roomID = playerRooms.get(socket.id)!;
+        const playerID = rooms.get(roomID)!.indexOf(socket.id);
+        const seats = currentSeats.get(roomID)!;
+
+        if (!seats.includes(playerID)) {
+            // Player is not in a seat.
+            return;
+        }
+
+        seats[seats.indexOf(playerID)] = -1;
+        currentSeats.set(roomID, seats);
+
+        io.in(roomID).emit('seat-change', seats);
     });
 
 
