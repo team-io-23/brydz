@@ -1,5 +1,5 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
-import { allCards, findDeclarer, findLastLegitBid, hideCards } from './server-utils';
+import { allCards, findDeclarer, findLastLegitBid, hideCards, cardComparator, cardValues, trumpValues } from './server-utils';
 import { Bid, Card, Score, Hand, PlayedCard } from './types';
 
 const io = require('socket.io')(8000, {
@@ -7,17 +7,6 @@ const io = require('socket.io')(8000, {
         origin: '*',
     }
 });
-
-
-const cardValues = new Map<string, number>([
-    ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
-    ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
-])
-
-const trumpValues = new Map<string, number>([
-    ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
-]);
-
 
 const ZERO_BID: Bid = {
     value: '0',
@@ -58,6 +47,12 @@ function dealCards(roomID: number) {
     for (let i = 0; i < 52; i++) {
         hands[i % 4].push(cards[i]);
     }
+
+    // Sort each hand
+    for (let i = 0; i < 4; i++) {
+        hands[i].sort(cardComparator);
+    }
+
 
     currentHands.set(roomID, [
         {cards: hands[0], player: 0},
@@ -127,9 +122,10 @@ function getWinner(roomID: number) {
 }
 
 
-export function checkCorrectBid(bid: Bid, currentBid: Bid) {
+export function checkCorrectBid(bid: Bid, lastBid: Bid, lastLegitBid: Bid) {
     // TODO - doubles and redoubles
-    if (bid === undefined || currentBid === undefined) {
+    // TODO - lastBid will be used to check for turn order
+    if (bid === undefined || lastBid === undefined) {
         return false;
     }
 
@@ -138,10 +134,10 @@ export function checkCorrectBid(bid: Bid, currentBid: Bid) {
     }
 
     let trumpValue = trumpValues.get(bid.trump)!;
-    let currentTrumpValue = trumpValues.get(currentBid.trump)!;
+    let currentTrumpValue = trumpValues.get(lastLegitBid.trump)!;
 
 
-    if (bid.value > currentBid.value || (bid.value === currentBid.value && trumpValue > currentTrumpValue)) {
+    if (bid.value > lastLegitBid.value || (bid.value === lastLegitBid.value && trumpValue > currentTrumpValue)) {
         return true;
     } else {
         return false;
@@ -278,9 +274,10 @@ io.on('connection', socket => {
     socket.on('bid', (bid: Bid) => {
         // TODO - doubles/redoubles
         const roomID = playerRooms.get(socket.id)!;
+        const lastLegitBid = findLastLegitBid(biddingHistory.get(roomID)!);
         const lastBid = biddingHistory.get(roomID)![biddingHistory.get(roomID)!.length - 1];
 
-        if (!checkCorrectBid(bid, lastBid)) {
+        if (!checkCorrectBid(bid, lastBid, lastLegitBid)) {
             console.log("Illegal bid / Not your turn!");
             return;
         } // TODO - testing, add turn check later

@@ -5,10 +5,10 @@
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 20px;
-    height: 10%;
+    font-size: 14px;
+    height: 12.5%;
     width: 20%;
-    padding: 20px;
+    padding: 5px;
     border: 1px solid #000000;
 }
 
@@ -36,14 +36,20 @@
     background-color: #808080; /* Gray */
 }
 
+.button:hover {
+    background-color: #555555;
+    color: white;
+}
+
 .bidding {
 
 }
 
 .bidding-options {
     position: absolute;
-    top: 15%;
-    left: 25%;
+    top: 32%;
+    left: 16%;
     width: 40%;
+    height: 48%;
     padding: 30px;
 }

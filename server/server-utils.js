@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findDeclarer = exports.findLastLegitBid = exports.hideCards = exports.placeholderCard = exports.allCards = void 0;
+exports.cardComparator = exports.findDeclarer = exports.findLastLegitBid = exports.hideCards = exports.trumpValues = exports.cardValues = exports.placeholderCard = exports.allCards = void 0;
 // TODO - ładniej to
 exports.allCards = [
     { suit: 'spades', rank: '2', symbol: '♠' },
@@ -57,6 +57,18 @@ exports.allCards = [
     { suit: 'diams', rank: 'a', symbol: '♦' }
 ];
 exports.placeholderCard = { rank: 'none', suit: 'none', symbol: 'none' };
+exports.cardValues = new Map([
+    ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
+    ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
+]);
+exports.trumpValues = new Map([
+    ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
+]);
+// This is different than trump values to make it more aesthetically pleasing.
+// It has not effect on the game logic, only on the display.
+var displaySuitValues = new Map([
+    ["none", 0], ["diams", 1], ["clubs", 2], ["hearts", 3], ["spades", 4]
+]);
 function hideCards(hands, player, dummy, show) {
     var resultHands = [];
     for (var i = 0; i < hands.length; i++) {
@@ -92,3 +104,12 @@ function findDeclarer(bids) {
     return declarer;
 }
 exports.findDeclarer = findDeclarer;
+function cardComparator(card1, card2) {
+    if (card1.suit === card2.suit) {
+        return exports.cardValues.get(card1.rank) > exports.cardValues.get(card2.rank) ? 1 : -1;
+    }
+    else {
+        return displaySuitValues.get(card1.suit) > displaySuitValues.get(card2.suit) ? 1 : -1;
+    }
+}
+exports.cardComparator = cardComparator;
