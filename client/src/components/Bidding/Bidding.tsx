@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import "./Bidding.css";
 import { socket } from "../App";
 import { useNavigate } from "react-router";
-import CurrentContract from "../Room/CurrentContract";
+import CurrentContract from "../Room/TopBar/CurrentContract";
 import { useEffect, useState } from "react";
 import CurrentBidder from "./CurrentBidder";
 import BiddingHistory from "./BiddingHistory";
@@ -11,7 +11,7 @@ import HandView from "../Room/HandView/HandView";
 import SeatIndicator from "../Room/SeatIndicator";
 
 import "./Bidding.css";
-import "../Room/TopBar.css";
+import "../Room/TopBar/TopBar.css";
 
 // TODO: testing html
 function Bidding () {
@@ -97,7 +97,10 @@ function Bidding () {
 
     return (
         <div className="bidding">
-            <BiddingHistory />
+            <div className='info-container'>
+                <BiddingHistory />
+            </div>
+            
             <div className="play-area-container">
             <div className="top-container">
                 <CurrentBidder />

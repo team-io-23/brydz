@@ -30,6 +30,7 @@ function PlayedCards() {
         console.log("Player number " + playedBy + " played card: " + card.rank + " of " + card.suit);
         localStorage.setItem(`suit-${socket.id}`, currentSuit);
         localStorage.setItem(`nextPlayer-${socket.id}`, ((playedBy + 1) % 4).toString());
+        socket.emit("get-hands");
         playCard(card, playedBy);
     });
 

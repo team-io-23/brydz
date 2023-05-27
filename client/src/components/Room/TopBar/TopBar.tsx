@@ -1,7 +1,7 @@
 import CurrentScore from "./CurrentScore";
 import CurrentContract from "./CurrentContract";
 import './TopBar.css'
-import { Contract, Score } from "../../utils";
+import { Contract, Score } from "../../../utils";
 
 interface Props {
     result: Score;

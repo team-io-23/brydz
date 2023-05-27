@@ -211,7 +211,7 @@ io.on('connection', function (socket) {
                 };
             }
             results.set(roomID, newScore);
-            io.in(roomID).emit('trick-over', results.get(roomID));
+            io.in(roomID).emit('trick-over', results.get(roomID), { cards: currentTricks.get(roomID), winner: winnerIndex });
             io.in(roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
             return;
         }

@@ -38,17 +38,17 @@ function BiddingHistory() {
                 </TableRow>
             )
         } 
-
+    // TODO - trzeci pas się nie wyśwtietla
     return (
         <div className="bidding-history-container">
             <TableContainer component={Paper}>
                 <Table aria-label="simple table">
                 <TableHead>
                     <TableRow className="row header">
-                    <TableCell sx={headerCellStyles}>North</TableCell>
-                    <TableCell sx={headerCellStyles}>East</TableCell>
                     <TableCell sx={headerCellStyles}>South</TableCell>
                     <TableCell sx={headerCellStyles}>West</TableCell>
+                    <TableCell sx={headerCellStyles}>North</TableCell>
+                    <TableCell sx={headerCellStyles}>Eest</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

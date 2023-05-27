@@ -25,6 +25,12 @@ export interface Hand {
 }
 
 
+export interface Trick {
+    cards: Array<Card>;
+    winner: number;
+}
+
+
 export interface Score {
     teamOne: number;
     teamTwo: number;
@@ -86,6 +92,7 @@ export const trumpSymbols = new Map<string, string>([
     ["none", ""]
 ]);
 
+// TODO - fajnie jakby jednak North był jako 0
 export const seats = new Map<number, string>([
     [0, "South"],
     [1, "West"],
