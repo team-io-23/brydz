@@ -1,5 +1,5 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
-import { allCards, findDeclarer, findLastLegitBid, hideCards, cardComparator, cardValues, trumpValues } from './server-utils';
+import { allCards, findDeclarer, findLastLegitBid, hideCards, cardComparator, cardValues, trumpValues, isDoubled } from './server-utils';
 import { Bid, Card, Score, Hand, PlayedCard } from './types';
 
 const io = require('socket.io')(8000, {
@@ -124,9 +124,11 @@ function getWinner(roomID: number) {
 }
 
 
-export function checkCorrectBid(bid: Bid, lastBid: Bid, lastLegitBid: Bid) {
-    // TODO - doubles and redoubles
+export function checkCorrectBid(bid: Bid, bidHistory: Bid[]) {
     // TODO - lastBid will be used to check for turn order
+    const lastLegitBid = findLastLegitBid(bidHistory);
+    const lastBid = bidHistory[bidHistory.length - 1];
+
     if (bid === undefined || lastBid === undefined) {
         return false;
     }
@@ -134,6 +136,17 @@ export function checkCorrectBid(bid: Bid, lastBid: Bid, lastLegitBid: Bid) {
     if (bid.value === "pass") {
         return true;
     }
+
+    if (bid.value === "X") {
+        // We can only double our opponents.
+        return lastLegitBid.bidder % 2 !== bid.bidder % 2;
+    }
+
+    if (bid.value === "XX") {
+        // We can only redouble our opponents and only if they doubled.
+        return lastLegitBid.bidder % 2 !== bid.bidder % 2 && isDoubled(bidHistory);
+    }
+
 
     let trumpValue = trumpValues.get(bid.trump)!;
     let currentTrumpValue = trumpValues.get(lastLegitBid.trump)!;
@@ -324,10 +337,9 @@ io.on('connection', socket => {
     socket.on('bid', (bid: Bid) => {
         // TODO - doubles/redoubles
         const roomID = playerRooms.get(socket.id)!;
-        const lastLegitBid = findLastLegitBid(biddingHistory.get(roomID)!);
-        const lastBid = biddingHistory.get(roomID)![biddingHistory.get(roomID)!.length - 1];
+        const bidHistory = biddingHistory.get(roomID)!;
 
-        if (!checkCorrectBid(bid, lastBid, lastLegitBid)) {
+        if (!checkCorrectBid(bid, bidHistory)) {
             console.log("Illegal bid / Not your turn!");
             return;
         } // TODO - testing, add turn check later

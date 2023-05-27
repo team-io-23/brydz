@@ -95,7 +95,7 @@ export function findLastLegitBid(bids: Bid[]){
     let index = bids.length - 1;
     let lastBid = bids[index];
 
-    while (lastBid.value === 'pass' || lastBid.value === 'double' || lastBid.value === 'redouble') {
+    while (lastBid.value === 'pass' || lastBid.value === 'X' || lastBid.value === 'XX') {
         index--;
         lastBid = bids[index];
     }
@@ -123,4 +123,30 @@ export function cardComparator(card1: Card, card2: Card) {
     } else {
         return displaySuitValues.get(card1.suit)! > displaySuitValues.get(card2.suit)! ? 1 : -1;
     }
+}
+
+function doubles(bids: Bid[]) {
+    const lastBid = findLastLegitBid(bids);
+    const bidID = bids.indexOf(lastBid);
+
+    let result: Bid | undefined;
+
+    for (let i = bidID + 1; i < bids.length; i++) {
+        if (bids[i].value === 'XX') {
+            return bids[i];
+        } else if (bids[i].value === 'X') {
+            result = bids[i];
+        }
+    }
+    
+    if (result === undefined) {
+        return lastBid;
+    } else {
+        return result;
+    }
+}
+
+
+export function isDoubled(bids: Bid[]) {
+    return doubles(bids).value === 'X';
 }

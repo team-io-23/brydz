@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cardComparator = exports.findDeclarer = exports.findLastLegitBid = exports.hideCards = exports.trumpValues = exports.cardValues = exports.placeholderCard = exports.allCards = void 0;
+exports.isDoubled = exports.cardComparator = exports.findDeclarer = exports.findLastLegitBid = exports.hideCards = exports.trumpValues = exports.cardValues = exports.placeholderCard = exports.allCards = void 0;
 // TODO - ładniej to
 exports.allCards = [
     { suit: 'spades', rank: '2', symbol: '♠' },
@@ -87,7 +87,7 @@ exports.hideCards = hideCards;
 function findLastLegitBid(bids) {
     var index = bids.length - 1;
     var lastBid = bids[index];
-    while (lastBid.value === 'pass' || lastBid.value === 'double' || lastBid.value === 'redouble') {
+    while (lastBid.value === 'pass' || lastBid.value === 'X' || lastBid.value === 'XX') {
         index--;
         lastBid = bids[index];
     }
@@ -113,3 +113,26 @@ function cardComparator(card1, card2) {
     }
 }
 exports.cardComparator = cardComparator;
+function doubles(bids) {
+    var lastBid = findLastLegitBid(bids);
+    var bidID = bids.indexOf(lastBid);
+    var result;
+    for (var i = bidID + 1; i < bids.length; i++) {
+        if (bids[i].value === 'XX') {
+            return bids[i];
+        }
+        else if (bids[i].value === 'X') {
+            result = bids[i];
+        }
+    }
+    if (result === undefined) {
+        return lastBid;
+    }
+    else {
+        return result;
+    }
+}
+function isDoubled(bids) {
+    return doubles(bids).value === 'X';
+}
+exports.isDoubled = isDoubled;

@@ -105,14 +105,24 @@ function getWinner(roomID) {
     var winner = (firstPlayer + cards.indexOf(highest)) % 4;
     return winner;
 }
-function checkCorrectBid(bid, lastBid, lastLegitBid) {
+function checkCorrectBid(bid, bidHistory) {
     // TODO - doubles and redoubles
     // TODO - lastBid will be used to check for turn order
+    var lastLegitBid = (0, server_utils_1.findLastLegitBid)(bidHistory);
+    var lastBid = bidHistory[bidHistory.length - 1];
     if (bid === undefined || lastBid === undefined) {
         return false;
     }
     if (bid.value === "pass") {
         return true;
+    }
+    if (bid.value === "X") {
+        // We can only double our opponents.
+        return lastLegitBid.bidder % 2 !== bid.bidder % 2;
+    }
+    if (bid.value === "XX") {
+        // We can only redouble our opponents and only if they doubled.
+        return lastLegitBid.bidder % 2 !== bid.bidder % 2 && (0, server_utils_1.isDoubled)(bidHistory);
     }
     var trumpValue = server_utils_1.trumpValues.get(bid.trump);
     var currentTrumpValue = server_utils_1.trumpValues.get(lastLegitBid.trump);
@@ -259,9 +269,8 @@ io.on('connection', function (socket) {
     socket.on('bid', function (bid) {
         // TODO - doubles/redoubles
         var roomID = playerRooms.get(socket.id);
-        var lastLegitBid = (0, server_utils_1.findLastLegitBid)(biddingHistory.get(roomID));
-        var lastBid = biddingHistory.get(roomID)[biddingHistory.get(roomID).length - 1];
-        if (!checkCorrectBid(bid, lastBid, lastLegitBid)) {
+        var bidHistory = biddingHistory.get(roomID);
+        if (!checkCorrectBid(bid, bidHistory)) {
             console.log("Illegal bid / Not your turn!");
             return;
         } // TODO - testing, add turn check later
