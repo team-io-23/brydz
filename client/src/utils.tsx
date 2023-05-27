@@ -99,3 +99,5 @@ export const seats = new Map<number, string>([
     [2, "North"],
     [3, "East"]
 ]);
+
+export const arr = [0, 1, 2, 3]; // Fake array to map over

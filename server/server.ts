@@ -26,6 +26,7 @@ let results = new Map<number, Score>(); // roomID, scores
 let currentHands = new Map<number, Hand[]>(); // roomID, hands
 let currentDummy = new Map<number, number>(); // roomID, dummy player
 let showDummy = new Map<number, boolean>(); // roomID, show dummy cards
+let currentSeats = new Map<number, number[]>(); // roomID, seats
 
 function initRoom(roomID: number) {
     rooms.set(roomID, []);
@@ -37,6 +38,7 @@ function initRoom(roomID: number) {
     currentHands.set(roomID, []);
     currentDummy.set(roomID, -1);
     showDummy.set(roomID, false);
+    currentSeats.set(roomID, [-1, -1, -1, -1]);
     dealCards(roomID);
 }
 
@@ -166,7 +168,6 @@ io.on('connection', socket => {
     console.log('connected');
     
     socket.on('joining-room', nickname => {
-        console.log(nickname);
         nicknames.set(socket.id, nickname);
 
         if (playerRooms.get(socket.id) !== undefined) {
@@ -186,7 +187,6 @@ io.on('connection', socket => {
         rooms.get(currentRoomID)!.push(socket.id);
         playerRooms.set(socket.id, currentRoomID);
 
-        console.log(rooms.get(currentRoomID));
         socket.emit('joined-room', currentRoomID);
         
         // Informing players of change.
@@ -209,8 +209,57 @@ io.on('connection', socket => {
     });
 
 
+    socket.on('choose-seat', seat => {
+        const roomID = playerRooms.get(socket.id)!;
+        const playerID = rooms.get(roomID)!.indexOf(socket.id);
+        const seats = currentSeats.get(roomID)!;
+        
+        if(seats.includes(playerID) || seats[seat] !== -1) {
+            // Player is already in seat or seat is taken.
+            return;
+        }
+
+        seats[seat] = playerID;
+        currentSeats.set(roomID, seats);
+
+        io.in(roomID).emit('seat-change', seats);
+    });
+
+
+    socket.on('leave-seat', () => {
+        const roomID = playerRooms.get(socket.id)!;
+        const playerID = rooms.get(roomID)!.indexOf(socket.id);
+        const seats = currentSeats.get(roomID)!;
+
+        if (!seats.includes(playerID)) {
+            // Player is not in a seat.
+            return;
+        }
+
+        seats[seats.indexOf(playerID)] = -1;
+        currentSeats.set(roomID, seats);
+
+        io.in(roomID).emit('seat-change', seats);
+    });
+
+
     socket.on('start-game', () => {
         const roomID = playerRooms.get(socket.id)!;
+
+        // Set players in their seats order.
+        const seats = currentSeats.get(roomID)!;
+        const players = rooms.get(roomID)!;
+        for (let i = 0; i < 4; i++) {
+            if (seats[i] === -1) {
+                // Not all seats are filled.
+                // return; // TODO - uncomment this
+            }
+        }
+
+        console.log(players);
+        const orderedPlayers = [players[seats[0]], players[seats[1]], players[seats[2]], players[seats[3]]];
+        console.log(orderedPlayers);
+        rooms.set(roomID, orderedPlayers);
 
         io.in(roomID).emit('started-game', rooms.get(roomID)!.map(id => nicknames.get(id)));
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
@@ -222,7 +271,6 @@ io.on('connection', socket => {
         const card = played.card;
         const player = played.player;
 
-        console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
         const roomID = playerRooms.get(socket.id)!;
 
         currentTricks.get(roomID)!.push(card);
@@ -286,18 +334,12 @@ io.on('connection', socket => {
 
         biddingHistory.get(roomID)!.push(bid);
 
-        console.log(biddingHistory);
-
         if (checkForThreePasses(roomID)) {
             // Bidding is over.
-            console.log("Bidding over");
             let declarer = findDeclarer(biddingHistory.get(roomID)!);
             currentDummy.set(roomID, (declarer + 2) % 4);
             currentTurns.set(roomID, (declarer + 1) % 4);  // Next player after declarer starts.
 
-            console.log("Declarer: " + declarer);
-            console.log("Dummy: " + currentDummy.get(roomID));
-            
             io.in(roomID).emit('set-turn', currentTurns.get(roomID));
             io.in(roomID).emit('bidding-over');
 
@@ -305,7 +347,6 @@ io.on('connection', socket => {
             return;
         }
 
-        console.log("Bid made by: " + socket.id + " " + bid.value)
         io.in(roomID).emit('bid-made', bid);
     });
 
