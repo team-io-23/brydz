@@ -9,12 +9,14 @@ export interface Card {
 export interface Contract {
     value: string;
     trump: string;
+    doubles: string; // "", "X", "XX"
 }
 
 
 export interface Bid {
     value: string;
     trump: string;
+    doubles: string; // "", "X", "XX"
     bidder: number;
 }
 
@@ -71,8 +73,8 @@ export function BiddingOptions () {
     }
 
     options.push({ "value": "pass", "trump": "none", symbol: ""});
-    options.push({ "value": "double", "trump": "none", symbol: "X"});
-    options.push({ "value": "redouble", "trump": "none", symbol: "XX"});
+    options.push({ "value": "X", "trump": "none", symbol: ""});
+    options.push({ "value": "XX", "trump": "none", symbol: ""});
 
     return options;
 }
@@ -81,7 +83,7 @@ export function IsPassBid(bid: Bid) {
     return bid.value === "pass";
 }
 
-export const ZERO_BID = JSON.stringify({value: "0", trump: "none", bidder: -1});
+export const ZERO_BID = JSON.stringify({value: "0", trump: "none", doubles: "", bidder: -1});
 
 export const trumpSymbols = new Map<string, string>([
     ["clubs", "♣"],

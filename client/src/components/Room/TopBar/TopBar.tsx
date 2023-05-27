@@ -12,7 +12,7 @@ function TopBar(props: Props) {
     return (
         <div className="top-container">
             <CurrentScore teamOne={props.result.teamOne} teamTwo={props.result.teamTwo} />
-            <CurrentContract value={props.contract.value} trump={props.contract.trump} />
+            <CurrentContract value={props.contract.value} trump={props.contract.trump} doubles={props.contract.doubles} />
         </div>
     )
 }

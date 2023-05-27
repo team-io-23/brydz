@@ -1,5 +1,3 @@
-import { socket } from "../App"
-import { Bid, trumpSymbols } from "../../utils"
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
