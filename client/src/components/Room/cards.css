@@ -41,7 +41,7 @@
     left: 0px;
     top: 60%;
     -webkit-transform: translateY(-50%);
-    transform: translateY(-50%)
+    transform: translateY(-50%);
 }
 
 .eastHand {
@@ -119,16 +119,30 @@
     margin-left: -40px;
 }
 
-.westHand .card {
-    margin-left: 10px;
-    margin-top: -100px;
+.li-westHand {
+    margin-left: 10px !important;
+    margin-top: -75px !important;
+    rotate: 90deg; /* TODO - rotate 270 deg */
+}
+
+.li-eastHand {
+    margin-right: 10px !important;
+    margin-top: -75px !important;
     rotate: 90deg;
 }
 
+.westHand .card {
+    margin-left: 20px;
+}
+
 .eastHand .card {
-    margin-top: -100px;
-    margin-right: 10px;
-    rotate: 270deg;
+    margin-left: 0px;
+    margin-right: 40px;
+}
+
+
+.faceup {
+    margin-bottom: 0.8em !important;
 }
 
 .playingCards a.card {
@@ -136,6 +150,7 @@
 }
 
 /* selected and hover state */
+.northHandDummy a.card:hover,
 .southHand a.card:hover,
 .southHand a.card:active,
 .southHand a.card:focus,

@@ -30,8 +30,9 @@ function HandView({ player, position, hand }: HandViewProps) {
 
         let isOurTurn = turn === seat;
         let isDummyTurn = turn === dummy;
+        let isDummyCard = position === "northHandDummy";
         let canPlayFromDummy = (seat + 2) % 4 === dummy;
-        let canPlay = isOurTurn || (isDummyTurn && canPlayFromDummy);
+        let canPlay = isOurTurn || (isDummyTurn && isDummyCard && canPlayFromDummy);
 
         let currentSuit = localStorage.getItem(`suit-${socket.id}`)!;
 
@@ -51,7 +52,7 @@ function HandView({ player, position, hand }: HandViewProps) {
 
     function card(rank: string, suit: string, symbol: string) {
         return (
-            <a className={`card rank-${rank} ${suit} myAllCards`} onClick={playCard}>
+            <a className={`card rank-${rank} ${suit} myAllCards faceup`} onClick={playCard}>
                 <span className="rank">{rank.toUpperCase()}</span>
                 <span className="suit">{symbol}</span>
             </a>
@@ -69,7 +70,7 @@ function HandView({ player, position, hand }: HandViewProps) {
             <div className="playingCards faceImages">
                 <ul className="table">
                     {hand.cards.map(({ rank, suit, symbol }, index) => (
-                        <li key={index}>
+                        <li key={index} className={'li-' + position}>
                             {rank == 'none' ? back() : card(rank, suit, symbol)}
                         </li>
                     ))}
