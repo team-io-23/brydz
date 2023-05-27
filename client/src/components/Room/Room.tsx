@@ -1,25 +1,27 @@
 import HandView from "./HandView/HandView";
-import TopBar from "./TopBar";
+import TopBar from "./TopBar/TopBar";
 import { socket } from "../App";
-import { Contract, Hand, Score, seats } from "../../utils";
+import { Contract, Hand, Score, seats, Trick } from "../../utils";
 import { useEffect, useState } from "react";
 import PlayedCards from "./PlayedCards";
 import BiddingHistory from "../Bidding/BiddingHistory";
 import NextPlayerIndicator from "./NextPlayerIndicator"; // TODO - coś jest bardzo spierdolone z tym
 import SeatIndicator from "./SeatIndicator";
+import LastTrick from "./LastTrick";
 
 import "./Room.css";
 import "./Table.css";
 
 function Room() {
     let [result, setResult] = useState<Score>({ teamOne: 0, teamTwo: 0 });
-    let [hands, setHands] = useState<Array<Hand>>([
+    let [hands, setHands] = useState<Hand[]>([
         { cards: [], player: 0 },
         { cards: [], player: 1 },
         { cards: [], player: 2 },
         { cards: [], player: 3 },
     ]);
     let [dummy, setDummy] = useState<number>(-1);
+    let [lastTrick, setLastTrick] = useState<Trick>({ cards: [], winner: -1 });
 
     useEffect(() => {
         socket.emit("get-hands");
@@ -27,9 +29,14 @@ function Room() {
         console.log("Getting hands");
     }, []);
 
-    socket.on("trick-over", (results: Score) => {
+    socket.on("trick-over", (results: Score, endedTrick: Trick) => {
         // TODO: Clear table when trick is over.
         localStorage.setItem(`suit-${socket.id}`, ""); // Reset current suit
+        setLastTrick(endedTrick);
+        
+        console.log("Trick over");
+        console.log(lastTrick);
+        console.log(endedTrick);
 
         // Updating score.
         setResult(results);
@@ -98,7 +105,10 @@ function Room() {
                 )}
                 
             </div>
-            <BiddingHistory />
+            <div className="info-container">
+                <BiddingHistory />
+                <LastTrick lastTrick={lastTrick}/>
+            </div>
         </div>
     )
 }

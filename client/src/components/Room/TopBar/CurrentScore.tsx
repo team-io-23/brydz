@@ -1,7 +1,7 @@
 import React from "react";
 import './TopBar.css';
-import { socket } from "../App";
-import { Score } from "../../utils";
+import { socket } from "../../App";
+import { Score } from "../../../utils";
 
 const CurrentScore: React.FC<Score> = ({ teamOne, teamTwo }) => {
     let players = localStorage.getItem(`players-${socket.id}`)!.split(",");

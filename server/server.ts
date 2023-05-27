@@ -239,8 +239,6 @@ io.on('connection', socket => {
         if (currentTricks.get(roomID)!.length === 4) {
             // Trick is over.
             let winnerIndex = getWinner(roomID);
-            currentTricks.set(roomID, []);
-            currentTurns.set(roomID, winnerIndex);
 
             let newScore: Score;
 
@@ -258,9 +256,13 @@ io.on('connection', socket => {
                 };
             }
 
+            let thisTrick = currentTricks.get(roomID)!;
+
             results.set(roomID, newScore);
+            currentTricks.set(roomID, []);
+            currentTurns.set(roomID, winnerIndex);
             
-            io.in(roomID).emit('trick-over', results.get(roomID));
+            io.in(roomID).emit('trick-over', results.get(roomID), {cards: thisTrick, winner: winnerIndex});
             io.in(roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
             return;
         }
