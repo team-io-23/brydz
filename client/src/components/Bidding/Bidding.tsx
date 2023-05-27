@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import CurrentBidder from "./CurrentBidder";
 import BiddingHistory from "./BiddingHistory";
 import HandView from "../Room/HandView/HandView";
+import SeatIndicator from "../Room/SeatIndicator";
 
 import "./Bidding.css";
 import "../Room/TopBar.css";
@@ -106,6 +107,10 @@ function Bidding () {
                 <div className="play-table">
                     {hands.map((sth, index) => 
                         hand(index)
+                    )}
+
+                    {hands.map((sth, index) => 
+                        <SeatIndicator seat={index} relative={(index - seat + 4) % 4}/>
                     )}
                 </div>
             </div>

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import PlayedCards from "./PlayedCards";
 import BiddingHistory from "../Bidding/BiddingHistory";
 import NextPlayerIndicator from "./NextPlayerIndicator"; // TODO - coś jest bardzo spierdolone z tym
+import SeatIndicator from "./SeatIndicator";
 
 import "./Room.css";
 import "./Table.css";
@@ -76,6 +77,7 @@ function Room() {
         }
     }
 
+    // TODO - ten widok jest bardzo podobny tutaj i w Bidding - fajnie byłoby to jakoś połączyć
     return (
         <div>
             <div className="play-area-container">
@@ -83,6 +85,10 @@ function Room() {
                 <div className="play-table">
                     {hands.map((sth, index) => 
                         backHand(index)
+                    )}
+
+                    {hands.map((sth, index) => 
+                        <SeatIndicator seat={index} relative={(index - seat + 4) % 4}/>
                     )}
                     <PlayedCards />
                 </div>

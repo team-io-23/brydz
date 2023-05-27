@@ -8,13 +8,6 @@ var io = require('socket.io')(8000, {
         origin: '*',
     }
 });
-var cardValues = new Map([
-    ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
-    ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
-]);
-var trumpValues = new Map([
-    ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
-]);
 var ZERO_BID = {
     value: '0',
     trump: 'none',
@@ -50,6 +43,10 @@ function dealCards(roomID) {
     for (var i = 0; i < 52; i++) {
         hands[i % 4].push(cards[i]);
     }
+    // Sort each hand
+    for (var i = 0; i < 4; i++) {
+        hands[i].sort(server_utils_1.cardComparator);
+    }
     currentHands.set(roomID, [
         { cards: hands[0], player: 0 },
         { cards: hands[1], player: 1 },
@@ -78,10 +75,10 @@ function getWinner(roomID) {
     var cards = currentTricks.get(roomID);
     var highest;
     for (var i = 0; i < cards.length; i++) {
-        var rank = cardValues.get(cards[i].rank);
+        var rank = server_utils_1.cardValues.get(cards[i].rank);
         var highestRank = void 0;
         if (highest !== undefined) {
-            highestRank = cardValues.get(highest.rank);
+            highestRank = server_utils_1.cardValues.get(highest.rank);
         }
         if (highest === undefined) {
             // First card in a trick.
@@ -115,8 +112,8 @@ function checkCorrectBid(bid, lastBid, lastLegitBid) {
     if (bid.value === "pass") {
         return true;
     }
-    var trumpValue = trumpValues.get(bid.trump);
-    var currentTrumpValue = trumpValues.get(lastLegitBid.trump);
+    var trumpValue = server_utils_1.trumpValues.get(bid.trump);
+    var currentTrumpValue = server_utils_1.trumpValues.get(lastLegitBid.trump);
     if (bid.value > lastLegitBid.value || (bid.value === lastLegitBid.value && trumpValue > currentTrumpValue)) {
         return true;
     }

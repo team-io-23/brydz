@@ -58,6 +58,21 @@ export const allCards = [
 
 export const placeholderCard: Card = { rank: 'none', suit: 'none', symbol: 'none' }
 
+export const cardValues = new Map<string, number>([
+    ['a', 14], ['k', 13], ['q', 12], ['j', 11], ['10', 10], ['9', 9], ['8', 8],
+    ['7', 7], ['6', 6], ['5', 5], ['4', 4], ['3', 3], ['2', 2]
+])
+
+export const trumpValues = new Map<string, number>([
+    ["none", 0], ["clubs", 1], ["diams", 2], ["hearts", 3], ["spades", 4], ["no-trump", 5]
+]);
+
+// This is different than trump values to make it more aesthetically pleasing.
+// It has not effect on the game logic, only on the display.
+const displaySuitValues = new Map<string, number>([
+    ["none", 0], ["diams", 1], ["clubs", 2], ["hearts", 3], ["spades", 4]
+]);
+
 export function hideCards(hands: Hand[], player: number, dummy: number, show: boolean) {
     const resultHands: Hand[] = []
 
@@ -99,4 +114,13 @@ export function findDeclarer(bids: Bid[]) {
     const declarer: number = bids.find(bid => bid.trump === contractTrump && bid.value !== 'pass')?.bidder!;
 
     return declarer;
+}
+
+
+export function cardComparator(card1: Card, card2: Card) {
+    if (card1.suit === card2.suit) {
+        return cardValues.get(card1.rank)! > cardValues.get(card2.rank)! ? 1 : -1;
+    } else {
+        return displaySuitValues.get(card1.suit)! > displaySuitValues.get(card2.suit)! ? 1 : -1;
+    }
 }
