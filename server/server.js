@@ -140,7 +140,6 @@ function checkForThreePasses(roomID) {
 io.on('connection', function (socket) {
     console.log('connected');
     socket.on('joining-room', function (nickname) {
-        console.log(nickname);
         nicknames.set(socket.id, nickname);
         if (playerRooms.get(socket.id) !== undefined) {
             // Already in a room.
@@ -156,7 +155,6 @@ io.on('connection', function (socket) {
         socket.join(currentRoomID);
         rooms.get(currentRoomID).push(socket.id);
         playerRooms.set(socket.id, currentRoomID);
-        console.log(rooms.get(currentRoomID));
         socket.emit('joined-room', currentRoomID);
         // Informing players of change.
         io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
@@ -198,6 +196,19 @@ io.on('connection', function (socket) {
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
+        // Set players in their seats order.
+        var seats = currentSeats.get(roomID);
+        var players = rooms.get(roomID);
+        for (var i = 0; i < 4; i++) {
+            if (seats[i] === -1) {
+                // Not all seats are filled.
+                // return; // TODO - uncomment this
+            }
+        }
+        console.log(players);
+        var orderedPlayers = [players[seats[0]], players[seats[1]], players[seats[2]], players[seats[3]]];
+        console.log(orderedPlayers);
+        rooms.set(roomID, orderedPlayers);
         io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
         io.in(roomID).emit('hand-update', currentHands.get(roomID));
     });
@@ -205,7 +216,6 @@ io.on('connection', function (socket) {
         // TODO - check for valid card and turn order
         var card = played.card;
         var player = played.player;
-        console.log(socket.id + ' played ' + card.rank + ' of ' + card.suit);
         var roomID = playerRooms.get(socket.id);
         currentTricks.get(roomID).push(card);
         var currentSuit = currentTricks.get(roomID)[0].suit;
@@ -256,20 +266,15 @@ io.on('connection', function (socket) {
             return;
         } // TODO - testing, add turn check later
         biddingHistory.get(roomID).push(bid);
-        console.log(biddingHistory);
         if (checkForThreePasses(roomID)) {
             // Bidding is over.
-            console.log("Bidding over");
             var declarer = (0, server_utils_1.findDeclarer)(biddingHistory.get(roomID));
             currentDummy.set(roomID, (declarer + 2) % 4);
             currentTurns.set(roomID, (declarer + 1) % 4); // Next player after declarer starts.
-            console.log("Declarer: " + declarer);
-            console.log("Dummy: " + currentDummy.get(roomID));
             io.in(roomID).emit('set-turn', currentTurns.get(roomID));
             io.in(roomID).emit('bidding-over');
             return;
         }
-        console.log("Bid made by: " + socket.id + " " + bid.value);
         io.in(roomID).emit('bid-made', bid);
     });
     socket.on('get-hands', function () {
