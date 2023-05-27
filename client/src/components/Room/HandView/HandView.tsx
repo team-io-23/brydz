@@ -30,8 +30,9 @@ function HandView({ player, position, hand }: HandViewProps) {
 
         let isOurTurn = turn === seat;
         let isDummyTurn = turn === dummy;
+        let isDummyCard = position === "northHandDummy";
         let canPlayFromDummy = (seat + 2) % 4 === dummy;
-        let canPlay = isOurTurn || (isDummyTurn && canPlayFromDummy);
+        let canPlay = isOurTurn || (isDummyTurn && isDummyCard && canPlayFromDummy);
 
         let currentSuit = localStorage.getItem(`suit-${socket.id}`)!;
 

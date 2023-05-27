@@ -218,7 +218,7 @@ io.on('connection', socket => {
 
 
     socket.on('play-card', (played: PlayedCard) => {
-        // TODO - check for valid card.
+        // TODO - check for valid card and turn order
         const card = played.card;
         const player = played.player;
 
