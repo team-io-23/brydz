@@ -31,12 +31,15 @@
     height: 25%;
 }
 
-
 .taken {
+    background-color: #8c8c8c !important;
+}
+
+.mySeat {
     background-color: #fc3d3d !important;
 }
 
-.taken:hover {
+.mySeat:hover {
     background-color: #e20408 !important;
 }
 
