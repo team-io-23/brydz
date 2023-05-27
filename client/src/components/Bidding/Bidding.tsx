@@ -18,9 +18,9 @@ function Bidding () {
     let biddingOptions = BiddingOptions();
     let navigate = useNavigate();
 
-    let [bid, setBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Zero bid placeholder.
-    let [prevBid, setPrevBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Needed for the bullshit that is about to start.
-    let [actualBid, setActualBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Last non-pass bid.
+    let [bid, setBid] = useState<Bid>({value: "0", trump: "none", doubles: "", bidder: -1}); // Zero bid placeholder.
+    let [prevBid, setPrevBid] = useState<Bid>({value: "0", trump: "none", doubles: "", bidder: -1}); // Needed for the bullshit that is about to start.
+    let [actualBid, setActualBid] = useState<Bid>({value: "0", trump: "none", doubles: "", bidder: -1}); // Last non-pass bid.
     let [hands, setHands] = useState<Hand[]>([
         { cards: [], player: 0 },
         { cards: [], player: 1 },
@@ -42,7 +42,13 @@ function Bidding () {
         setPrevBid(bid);
 
         if (!IsPassBid(bid)) {
-            setActualBid(bid);
+            if (bid.value === "X" || bid.value === "XX") {
+                const currentBid = actualBid;
+                currentBid.doubles = bid.value;
+                setActualBid(currentBid);
+            } else {
+                setActualBid(bid);
+            }
         }
         
         // Setting current turn.
@@ -61,7 +67,6 @@ function Bidding () {
     }, [bid]);
 
     socket.on("bid-made", (newBid: Bid) => {
-        // TODO - doubles and redoubles
         console.log("Bid value: " + newBid.value);
         setBid(newBid);
     });
@@ -104,7 +109,7 @@ function Bidding () {
             <div className="play-area-container">
             <div className="top-container">
                 <CurrentBidder />
-                <CurrentContract value={actualBid.value} trump={actualBid.trump} />
+                <CurrentContract value={actualBid.value} trump={actualBid.trump} doubles={actualBid.doubles}/>
             </div>
 
                 <div className="play-table">
