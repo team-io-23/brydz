@@ -1,4 +1,4 @@
-import { BiddingOptions, Bid, IsPassBid } from "../../utils";
+import { BiddingOptions, Bid, IsPassBid, Hand, seats } from "../../utils";
 import { Button } from "@mui/material";
 import "./Bidding.css";
 import { socket } from "../App";
@@ -7,6 +7,7 @@ import CurrentContract from "../Room/CurrentContract";
 import { useEffect, useState } from "react";
 import CurrentBidder from "./CurrentBidder";
 import BiddingHistory from "./BiddingHistory";
+import HandView from "../Room/HandView/HandView";
 
 import "./Bidding.css";
 import "../Room/TopBar.css";
@@ -19,6 +20,16 @@ function Bidding () {
     let [bid, setBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Zero bid placeholder.
     let [prevBid, setPrevBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Needed for the bullshit that is about to start.
     let [actualBid, setActualBid] = useState<Bid>({value: "0", trump: "none", bidder: -1}); // Last non-pass bid.
+    let [hands, setHands] = useState<Hand[]>([
+        { cards: [], player: 0 },
+        { cards: [], player: 1 },
+        { cards: [], player: 2 },
+        { cards: [], player: 3 },
+    ]);
+
+    useEffect(() => {
+        socket.emit("get-hands");
+    }, []);
     
     useEffect(() => {
         console.log("Bidders: " + bid.bidder + ' ' + prevBid.bidder)
@@ -59,6 +70,11 @@ function Bidding () {
         navigate("/room");
     });
 
+
+    socket.on("hand-update", (hands: Hand[]) => {
+        setHands(hands);
+    })
+
     function handleBid(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         let bidString = event.currentTarget.className.split("button ")[1];
         let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
@@ -67,13 +83,33 @@ function Bidding () {
         socket.emit("bid", myBid);
     }
 
+    let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
+
+    function hand(playerSeat: number) { 
+        let relativeSeat = (playerSeat - seat + 4) % 4;
+        let direction = seats.get(relativeSeat)!.toLowerCase() + "Hand";
+
+        return (
+            <HandView player={playerSeat} position={direction} hand={hands[playerSeat]}/>
+        )
+    }
+
     return (
         <div className="bidding">
             <BiddingHistory />
+            <div className="play-area-container">
             <div className="top-container">
                 <CurrentBidder />
                 <CurrentContract value={actualBid.value} trump={actualBid.trump} />
             </div>
+
+                <div className="play-table">
+                    {hands.map((sth, index) => 
+                        hand(index)
+                    )}
+                </div>
+            </div>
+
             <div className="bidding-options">
                 {biddingOptions.map(({ value, trump, symbol }) => (
                     <button className={ `button ${value} ${trump}` } onClick={handleBid}>

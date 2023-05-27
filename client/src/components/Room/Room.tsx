@@ -50,7 +50,7 @@ function Room() {
     let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
 
     // TODO - połączyć w jedno
-    function backHand(playerSeat: number) {
+    function backHand(playerSeat: number) { 
         let relativeSeat = (playerSeat - seat + 4) % 4;
         let direction = seats.get(relativeSeat)!.toLowerCase() + "Hand";
         let declarer = (dummy + 2) % 4;
