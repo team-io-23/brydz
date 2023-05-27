@@ -136,6 +136,7 @@
 }
 
 /* selected and hover state */
+.northHandDummy a.card:hover,
 .southHand a.card:hover,
 .southHand a.card:active,
 .southHand a.card:focus,
