@@ -56,7 +56,7 @@
 .played-space-0 {
     position: absolute;
     left: 50%;
-    top: 65%;
+    top: 62%;
     -webkit-transform: translateX(-50%) translateY(-50%);
     transform: translateX(-50%) translateY(-50%);
 }
@@ -85,8 +85,9 @@
     transform: translateX(-50%) translateY(-50%);
 }
 
+
 .playedCards {
-    font-size: 1.3em;
+    font-size: 1.2em;
 }
 
 

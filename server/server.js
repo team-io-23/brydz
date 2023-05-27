@@ -193,8 +193,6 @@ io.on('connection', function (socket) {
         if (currentTricks.get(roomID).length === 4) {
             // Trick is over.
             var winnerIndex = getWinner(roomID);
-            currentTricks.set(roomID, []);
-            currentTurns.set(roomID, winnerIndex);
             var newScore = void 0;
             if (winnerIndex % 2 === 0) {
                 // Team 1 won the trick.
@@ -210,8 +208,11 @@ io.on('connection', function (socket) {
                     'teamTwo': results.get(roomID).teamTwo + 1
                 };
             }
+            var thisTrick = currentTricks.get(roomID);
             results.set(roomID, newScore);
-            io.in(roomID).emit('trick-over', results.get(roomID), { cards: currentTricks.get(roomID), winner: winnerIndex });
+            currentTricks.set(roomID, []);
+            currentTurns.set(roomID, winnerIndex);
+            io.in(roomID).emit('trick-over', results.get(roomID), { cards: thisTrick, winner: winnerIndex });
             io.in(roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
             return;
         }

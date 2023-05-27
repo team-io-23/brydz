@@ -48,7 +48,7 @@ function BiddingHistory() {
                     <TableCell sx={headerCellStyles}>South</TableCell>
                     <TableCell sx={headerCellStyles}>West</TableCell>
                     <TableCell sx={headerCellStyles}>North</TableCell>
-                    <TableCell sx={headerCellStyles}>Eest</TableCell>
+                    <TableCell sx={headerCellStyles}>East</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

@@ -33,6 +33,10 @@ function Room() {
         // TODO: Clear table when trick is over.
         localStorage.setItem(`suit-${socket.id}`, ""); // Reset current suit
         setLastTrick(endedTrick);
+        
+        console.log("Trick over");
+        console.log(lastTrick);
+        console.log(endedTrick);
 
         // Updating score.
         setResult(results);

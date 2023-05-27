@@ -9,3 +9,36 @@
     border: 10px solid #a95555;
     font-size: 0.8rem;
 }
+
+
+.played-space-small-0 {
+    position: absolute;
+    left: 50%;
+    top: 70%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.played-space-small-1 {
+    position: absolute;
+    left: 20%;
+    top: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.played-space-small-2 {
+    position: absolute;
+    left: 50%;
+    top: 27%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.played-space-small-3 {
+    position: absolute;
+    left: 80%;
+    top: 50%;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+}
