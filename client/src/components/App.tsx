@@ -8,6 +8,7 @@ import io from 'socket.io-client';
 import { SERVER } from '../config';
 import WaitingRoom from './WaitingRoom/WaitingRoom';
 import Bidding from './Bidding/Bidding';
+import MainMenu from './MainMenu/MainMenu';
 import { Hand } from '../utils';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Routes>
             <Route path = "/"       element = {<StartPage/>}/>
             <Route path = "*"       element = {<StartPage/>}/>
+            <Route path = "/mainMenu" element = {<MainMenu/>}/>
             <Route path = "/room"   element = {<Room/>}/>
             <Route path = "/waitingRoom"   element = {<WaitingRoom/>}/>
             <Route path = "/bidding"   element = {<Bidding/>}/>

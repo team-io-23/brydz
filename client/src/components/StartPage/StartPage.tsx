@@ -31,14 +31,10 @@ function StartPage() {
             console.log(socket.id);
             console.log("Setting nickname: " + nickname);
             localStorage.setItem(`nickname-${socket.id}`, nickname);
-
-            socket.emit("joining-room", nickname);
-            socket.on("joined-room", (room: string) => {
-                localStorage.setItem(`room-${socket.id}`, room);
-                console.log("Joined room: " + localStorage.getItem(`room-${socket.id}`));
-                navigate("/waitingRoom");
-            });
-            
+            socket.emit("entered", nickname);
+            navigate("/MainMenu");
+            socket.emit("get-roomlist");
+            return;
         }
 
         return (
