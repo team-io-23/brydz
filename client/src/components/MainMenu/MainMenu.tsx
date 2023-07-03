@@ -30,6 +30,7 @@ function MainMenu(){
     return (
         <div>
             <Button
+                className="create-room-button"
                 variant="contained"
                 onClick={handleCreate}
             >

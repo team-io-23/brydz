@@ -11,7 +11,16 @@ import Bidding from './Bidding/Bidding';
 import MainMenu from './MainMenu/MainMenu';
 
 function App() {
-  const theme = createTheme(); // TODO: Add custom theme
+  const theme =createTheme({
+    palette: {
+      primary: {
+        main: '#C41E3A',
+      },
+      secondary: {
+        main: '#D22B2B',
+      },
+    },
+  });
   return (
     <CssBaseline>
       <ThemeProvider theme={theme}>

@@ -70,6 +70,7 @@ function WaitingRoom() {
                 <div className='top-container-waiting-room'>
                     Room #{currentRoomID}
                 </div>
+
                 <div className="play-table">
                     {/* TODO - ładnie połączyć w jedno */}
                     {arr.map((sth, index) =>
@@ -82,12 +83,13 @@ function WaitingRoom() {
                 </div>                
             </div>
             <div className="info-container">
-                <PlayersList players={playersInRoom}/>
-                <NavLink 
+                <div className='invitation-link-container'><NavLink 
                     to={{pathname:"/link/"+currentRoomID}}
                 >
                     Invitation link
-                </NavLink>
+                </NavLink></div>
+                <PlayersList players={playersInRoom}/>
+
                 <div className="buttons">
                     <Button variant="contained" onClick={handleStart} className="start-button">
                         <PlayArrowIcon sx={{ fontSize: 30 }}/>
