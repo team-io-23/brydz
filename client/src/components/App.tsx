@@ -9,7 +9,6 @@ import { SERVER } from '../config';
 import WaitingRoom from './WaitingRoom/WaitingRoom';
 import Bidding from './Bidding/Bidding';
 import MainMenu from './MainMenu/MainMenu';
-import { Hand } from '../utils';
 
 function App() {
   const theme = createTheme(); // TODO: Add custom theme
@@ -24,6 +23,7 @@ function App() {
             <Route path = "/room"   element = {<Room/>}/>
             <Route path = "/waitingRoom"   element = {<WaitingRoom/>}/>
             <Route path = "/bidding"   element = {<Bidding/>}/>
+            <Route path = "/link/:roomLink" element = {<StartPage/>}/>
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

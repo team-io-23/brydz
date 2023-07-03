@@ -6,9 +6,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
-import { socket } from '../App';
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { NavigateFunction, useNavigate } from "react-router-dom";
+import { NavigateFunction} from "react-router-dom";
+import {joinRoom} from '../../utils';
 
 const cellStyles = {
     textAlign: 'center',
@@ -21,14 +20,6 @@ interface RoomListProps {
     navigate: NavigateFunction;
 }
 
-function joinRoom(roomNumber: any, navigate: (arg0: string) => void){
-    socket.emit("joining-room", roomNumber);
-    socket.on("joined-room", (room: string) => {
-        localStorage.setItem(`room-${socket.id}`, room);
-        console.log("Joined room: " + localStorage.getItem(`room-${socket.id}`));
-        navigate("/waitingRoom");
-    });
-}
 
 function RoomList(props: RoomListProps) {
     let it = Array.from(Array(props.rooms.length).keys());
@@ -40,7 +31,7 @@ function RoomList(props: RoomListProps) {
                     <TableRow>
                         <TableCell align="center">room number</TableCell>
                         <TableCell align="center">players</TableCell>
-                        <TableCell align="center">join the room</TableCell>
+                        <TableCell align="center">join</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -51,13 +42,13 @@ function RoomList(props: RoomListProps) {
                             </TableCell>
                             <TableCell align="center"> {props.seats[i]}/4 </TableCell>
                             <TableCell align="center"> 
-                            {props.seats[i] != 4 &&
+                            {props.seats[i] < 4 &&
                                 <Button
                                     variant="contained"
-                                    onClick={() => {joinRoom(props.rooms[i], props.navigate)}}
+                                    onClick={() => {joinRoom(+props.rooms[i], props.navigate)}}
                                 >join</Button>
                             }
-                            {props.seats[i] == 4 &&
+                            {props.seats[i] >= 4 &&
                                 <Button
                                     variant="contained"
                                     disabled

@@ -164,6 +164,11 @@ io.on('connection', function (socket) {
         updateTakenSeats();
     });
     socket.on('joining-room', function (joinedRoomID) {
+        if (rooms.get(joinedRoomID).length >= 4) {
+            console.log("the room is full");
+            socket.emit('room-is-full');
+            return;
+        }
         socket.join(joinedRoomID);
         rooms.get(joinedRoomID).push(socket.id);
         playerRooms.set(socket.id, joinedRoomID);

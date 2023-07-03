@@ -1,3 +1,5 @@
+import { socket } from "./components/App";
+
 // Interface of a card.
 export interface Card {
     rank: string;
@@ -38,6 +40,23 @@ export interface Score {
     teamTwo: number;
 }
 
+// handles joining room
+export function joinRoom(roomNumber: number, navigate: (arg0: string) => void){
+    socket.emit("joining-room", roomNumber);
+    console.log("trying to join no:" + roomNumber);
+    socket.on("joined-room", (room: string) => {
+        navigate("/waitingRoom");
+        localStorage.setItem(`room-${socket.id}`, room);
+        console.log("Joined room: " + localStorage.getItem(`room-${socket.id}`));
+        return;
+    });
+    socket.on("room-is-full", function (){
+        alert("The room you are trying to join is full.");
+        navigate("/mainMenu");
+        socket.emit("get-roomlist");
+        return;
+    });
+}
 
 // Returns a boolean value if the card is a legal card to play or not.
 export function checkCorrectCard(playerCards: Array<Card>, cardSuit: string, playingSuit: string) {
