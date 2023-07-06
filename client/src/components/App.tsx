@@ -8,10 +8,19 @@ import io from 'socket.io-client';
 import { SERVER } from '../config';
 import WaitingRoom from './WaitingRoom/WaitingRoom';
 import Bidding from './Bidding/Bidding';
-import { Hand } from '../utils';
+import MainMenu from './MainMenu/MainMenu';
 
 function App() {
-  const theme = createTheme(); // TODO: Add custom theme
+  const theme =createTheme({
+    palette: {
+      primary: {
+        main: '#C41E3A',
+      },
+      secondary: {
+        main: '#D22B2B',
+      },
+    },
+  });
   return (
     <CssBaseline>
       <ThemeProvider theme={theme}>
@@ -19,9 +28,11 @@ function App() {
           <Routes>
             <Route path = "/"       element = {<StartPage/>}/>
             <Route path = "*"       element = {<StartPage/>}/>
+            <Route path = "/mainMenu" element = {<MainMenu/>}/>
             <Route path = "/room"   element = {<Room/>}/>
             <Route path = "/waitingRoom"   element = {<WaitingRoom/>}/>
             <Route path = "/bidding"   element = {<Bidding/>}/>
+            <Route path = "/link/:roomLink" element = {<StartPage/>}/>
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

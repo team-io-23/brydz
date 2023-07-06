@@ -2,6 +2,7 @@ import { useState } from "react";
 import { socket } from "../App";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router";
+import { NavLink } from "react-router-dom";
 import { ZERO_BID, arr } from "../../utils";
 import SeatIndicator from "../Room/SeatIndicator";
 import SeatButton from "./SeatButton";
@@ -18,6 +19,8 @@ function WaitingRoom() {
     let [seats, setSeats] = useState<number[]>([-1, -1, -1, -1]);
 
     let navigate = useNavigate();
+
+    let currentRoomID = localStorage.getItem(`room-${socket.id}`)!;
 
     socket.on("player-change", (players: Array<string>) => {
         setPlayersInRoom(players);
@@ -65,8 +68,9 @@ function WaitingRoom() {
         <div>
             <div className="play-area-container">
                 <div className='top-container-waiting-room'>
-                    Room #{localStorage.getItem(`room-${socket.id}`)}
+                    Room #{currentRoomID}
                 </div>
+
                 <div className="play-table">
                     {/* TODO - ładnie połączyć w jedno */}
                     {arr.map((sth, index) =>
@@ -79,7 +83,13 @@ function WaitingRoom() {
                 </div>                
             </div>
             <div className="info-container">
+                <div className='invitation-link-container'><NavLink 
+                    to={{pathname:"/link/"+currentRoomID}}
+                >
+                    Invitation link
+                </NavLink></div>
                 <PlayersList players={playersInRoom}/>
+
                 <div className="buttons">
                     <Button variant="contained" onClick={handleStart} className="start-button">
                         <PlayArrowIcon sx={{ fontSize: 30 }}/>

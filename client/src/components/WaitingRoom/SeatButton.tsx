@@ -1,10 +1,9 @@
-import { Trick, arr, seats } from '../../utils';
+import { seats } from '../../utils';
 import { socket } from '../App';
 import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CloseIcon from '@mui/icons-material/Close';
-import { useState } from 'react';
 
 import './SeatButton.css';
 
