@@ -106,7 +106,6 @@ function getWinner(roomID) {
     return winner;
 }
 function checkCorrectBid(bid, bidHistory) {
-    // TODO - doubles and redoubles
     // TODO - lastBid will be used to check for turn order
     var lastLegitBid = (0, server_utils_1.findLastLegitBid)(bidHistory);
     var lastBid = bidHistory[bidHistory.length - 1];
@@ -147,20 +146,20 @@ function checkForThreePasses(roomID) {
     }
     return passes === 3;
 }
-function updateTakenSeats(){
+function updateTakenSeats() {
     var newSeats = [];
-    rooms.forEach((value, key) => {
+    rooms.forEach(function (value, key) {
         newSeats.push(value.length);
-    })
+    });
     io.emit('seatstaken-change', newSeats);
 }
 io.on('connection', function (socket) {
     console.log('connected');
-    socket.on('entered', function(nickname){
+    socket.on('entered', function (nickname) {
         nicknames.set(socket.id, nickname);
     });
     socket.on('get-roomlist', function () {
-        io.emit('roomlist-change',Array.from( rooms.keys() ));
+        io.emit('roomlist-change', Array.from(rooms.keys()));
         updateTakenSeats();
     });
     socket.on('joining-room', function (joinedRoomID) {
@@ -169,6 +168,12 @@ io.on('connection', function (socket) {
             socket.emit('room-is-full');
             return;
         }
+        if (playerRooms.get(socket.id) !== undefined) {
+            // Already in a room.
+            socket.emit('joined-room', playerRooms.get(socket.id));
+            return;
+        }
+        // Joining room.
         socket.join(joinedRoomID);
         rooms.get(joinedRoomID).push(socket.id);
         playerRooms.set(socket.id, joinedRoomID);
@@ -178,15 +183,17 @@ io.on('connection', function (socket) {
         io.in(joinedRoomID).emit('seat-change', currentSeats.get(joinedRoomID));
         updateTakenSeats();
     });
-    socket.on('creating-room', function(){
-        console.log("creating room");
+    socket.on('creating-room', function () {
+        // Create room.
         currentRoomID++;
         initRoom(currentRoomID);
+        // Join newly created room
         socket.join(currentRoomID);
         rooms.get(currentRoomID).push(socket.id);
         playerRooms.set(socket.id, currentRoomID);
         socket.emit('created-room', currentRoomID);
-        io.emit('roomlist-change',Array.from( rooms.keys() ));
+        // Sending info
+        io.emit('roomlist-change', Array.from(rooms.keys()));
         io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
         updateTakenSeats();
     });
