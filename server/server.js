@@ -3,7 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkCorrectBid = void 0;
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 var server_utils_1 = require("./server-utils");
-var io = require('socket.io')(8000, {
+var express = require('express');
+var PORT = 8000;
+var INDEX = '../client/public/index.html';
+var server = express()
+    .use(function (req, res) { return res.sendFile(INDEX, { root: __dirname }); })
+    .listen(PORT, function () { return console.log("Listening on ".concat(PORT)); });
+var io = require('socket.io')(server, {
     cors: {
         origin: '*',
     }

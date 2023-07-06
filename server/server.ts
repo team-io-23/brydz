@@ -1,8 +1,8 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 import { allCards, findDeclarer, findLastLegitBid, hideCards, cardComparator, cardValues, trumpValues, isDoubled } from './server-utils';
 import { Bid, Card, Score, Hand, PlayedCard } from './types';
-import express from 'express';
 
+const express = require('express');
 const PORT = 8000;
 const INDEX = '../client/public/index.html';
 
