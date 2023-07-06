@@ -13,6 +13,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "socket.io": "^4.6.1"
+    "express": "^4.18.2",
+    "socket.io": "^4.7.1"
   }
 }

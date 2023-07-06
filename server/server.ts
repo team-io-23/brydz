@@ -1,8 +1,15 @@
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 import { allCards, findDeclarer, findLastLegitBid, hideCards, cardComparator, cardValues, trumpValues, isDoubled } from './server-utils';
 import { Bid, Card, Score, Hand, PlayedCard } from './types';
+import express from 'express';
 
-const io = require('socket.io')(8000, {
+const PORT = 8000;
+const INDEX = '/';
+
+const server = express()
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+const io = require('socket.io')(server, {
     cors: {
         origin: '*',
     }
