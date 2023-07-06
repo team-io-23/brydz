@@ -4,7 +4,7 @@ exports.checkCorrectBid = void 0;
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 var server_utils_1 = require("./server-utils");
 var express = require('express');
-var PORT = 8000;
+var PORT = process.env.PORT || 8000;
 var server = express()
     .listen(PORT, function () { return console.log("Listening on ".concat(PORT)); });
 var io = require('socket.io')(server, {

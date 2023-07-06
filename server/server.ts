@@ -3,7 +3,7 @@ import { allCards, findDeclarer, findLastLegitBid, hideCards, cardComparator, ca
 import { Bid, Card, Score, Hand, PlayedCard } from './types';
 
 const express = require('express');
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 const server = express()
     .listen(PORT, () => console.log(`Listening on ${PORT}`));
