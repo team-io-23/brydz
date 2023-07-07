@@ -6,7 +6,7 @@ const CurrentContract: React.FC<Contract> = ({ value, trump, doubles }) => {
     // TODO - coloring of suit
     let symbol = trumpSymbols.get(trump)!;
     return (
-        <div className="info-box right">
+        <div className="info-box content">
             Contract: 
             <div className="contract-box">
                 {value} {symbol} {doubles}
