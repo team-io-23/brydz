@@ -249,6 +249,16 @@ io.on('connection', socket => {
             return;
         }
 
+        const playerID = rooms.get(roomID)!.indexOf(socket.id);
+        const seats = currentSeats.get(roomID)!;
+
+        if (seats.includes(playerID)) {
+            // Player is in a seat.
+            seats[seats.indexOf(playerID)] = -1;
+            currentSeats.set(roomID, seats);
+            io.in(roomID).emit('seat-change', seats);
+        }
+
         // Leaving room.
         socket.leave(roomID);
         rooms.set(roomID, rooms.get(roomID)!.filter(id => id !== socket.id)); // Remove player from room.
