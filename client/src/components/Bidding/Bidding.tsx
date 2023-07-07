@@ -86,6 +86,13 @@ function Bidding () {
         let seat = parseInt(localStorage.getItem(`seat-${socket.id}`)!);
         let myBid = {value: bidString.split(" ")[0], trump: bidString.split(" ")[1], bidder: seat};
 
+        let bid_turn = localStorage.getItem(`bid-turn-${socket.id}`)!;
+        let mySeat = localStorage.getItem(`seat-${socket.id}`)!;
+        if (bid_turn !== mySeat) {
+            console.log("Not your turn!");
+            return;
+        }
+
         socket.emit("bid", myBid);
     }
 
