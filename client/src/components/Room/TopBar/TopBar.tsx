@@ -6,6 +6,7 @@ import { Contract, Score } from "../../../utils";
 interface Props {
     result: Score;
     contract: Contract;
+    turn: number;
 }
 
 function TopBar(props: Props) {
@@ -13,6 +14,7 @@ function TopBar(props: Props) {
         <div className="top-container">
             <CurrentScore teamOne={props.result.teamOne} teamTwo={props.result.teamTwo} />
             <CurrentContract value={props.contract.value} trump={props.contract.trump} doubles={props.contract.doubles} />
+            <div className="info-box right"> Turn: {props.turn} </div>
         </div>
     )
 }

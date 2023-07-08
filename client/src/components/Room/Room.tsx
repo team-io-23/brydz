@@ -22,6 +22,7 @@ function Room() {
     ]);
     let [dummy, setDummy] = useState<number>(-1);
     let [lastTrick, setLastTrick] = useState<Trick>({ cards: [], winner: -1 });
+    let [turn, setTurn] = useState<number>(1);
 
     useEffect(() => {
         socket.emit("get-hands");
@@ -33,7 +34,7 @@ function Room() {
         // TODO: Clear table when trick is over.
         localStorage.setItem(`suit-${socket.id}`, ""); // Reset current suit
         setLastTrick(endedTrick);
-        
+        setTurn(turn+1);
         console.log("Trick over");
         console.log(lastTrick);
         console.log(endedTrick);
@@ -88,7 +89,7 @@ function Room() {
     return (
         <div>
             <div className="play-area-container">
-                <TopBar result={result} contract={contract}/>
+                <TopBar result={result} contract={contract} turn={turn}/>
                 <div className="play-table">
                     {hands.map((sth, index) => 
                         backHand(index)
