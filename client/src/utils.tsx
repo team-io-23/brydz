@@ -1,5 +1,7 @@
 import { socket } from "./components/App";
 
+// TODO: wydzielić te typy wspólnie dla servera i clienta bo są takie same w większości
+
 // Interface of a card.
 export interface Card {
     rank: string;
@@ -38,6 +40,12 @@ export interface Trick {
 export interface Score {
     teamOne: number;
     teamTwo: number;
+}
+
+export interface Points {
+    Beneath: Array<Array<Array<number>>>;
+    Above: Array<Array<number>>;
+    Vulnerable: Array<boolean>;
 }
 
 // handles joining room
