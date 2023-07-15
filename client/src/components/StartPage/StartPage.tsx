@@ -13,6 +13,28 @@ function StartPage() {
     const navigate = useNavigate();
 
     const { roomLink } = useParams();
+
+    const handleJoin = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        console.log(socket.id);
+        console.log("Setting nickname: " + nickname);
+        localStorage.setItem(`nickname-${socket.id}`, nickname);
+        socket.emit("entered", nickname);
+        if (roomLink != undefined) {
+            joinRoom(+roomLink, navigate);
+            return;
+        }
+
+        navigate("/MainMenu");
+        socket.emit("get-roomlist");
+        return;
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            handleJoin(event as any);
+        }
+    }
+
     function NicknameInputField() {
         return (
             <div className='StartPage-NicknameInputFieldWrapper'>
@@ -23,35 +45,9 @@ function StartPage() {
                     className='StartPage-NicknameInputField'
                     value={nickname}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => setNickname(event.target.value)}
+                    onKeyDown={handleKeyDown}
                 />
             </div>
-        );
-    }
-
-    function JoinButton() {
-        function handleJoin(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-            console.log(socket.id);
-            console.log("Setting nickname: " + nickname);
-            localStorage.setItem(`nickname-${socket.id}`, nickname);
-            socket.emit("entered", nickname);
-            if (roomLink != undefined) {
-                joinRoom(+roomLink, navigate);
-                return;
-            }
-
-            navigate("/MainMenu");
-            socket.emit("get-roomlist");
-            return;
-        }
-
-        return (
-            <Button
-                variant="contained"
-                onClick={handleJoin}
-                className='StartPage-JoinButton'
-            >
-                Join
-            </Button>
         );
     }
 
@@ -60,7 +56,13 @@ function StartPage() {
             <NavBar/>
             <div className='StartPage-Input'>
                 <NicknameInputField />
-                <JoinButton />
+                <Button
+                    variant="contained"
+                    onClick={handleJoin}
+                    className='StartPage-JoinButton'
+                >
+                    Join
+                </Button>
             </div>
         </div>
     );

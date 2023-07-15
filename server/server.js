@@ -1,11 +1,11 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.checkCorrectBid = void 0;
 // TODO - sockety do jednego ładnego pliku a nie w każdym komponencie osobno
 var server_utils_1 = require("./server-utils");
 var io = require('socket.io')(8000, {
     cors: {
-        origin: '*',
+        origin: '*'
     }
 });
 var ZERO_BID = {
@@ -179,8 +179,8 @@ io.on('connection', function (socket) {
         playerRooms.set(socket.id, joinedRoomID);
         socket.emit('joined-room', joinedRoomID);
         // Informing players of change.
-        io.in(joinedRoomID).emit('player-change', rooms.get(joinedRoomID).map(function (id) { return nicknames.get(id); }));
-        io.in(joinedRoomID).emit('seat-change', currentSeats.get(joinedRoomID));
+        io["in"](joinedRoomID).emit('player-change', rooms.get(joinedRoomID).map(function (id) { return nicknames.get(id); }));
+        io["in"](joinedRoomID).emit('seat-change', currentSeats.get(joinedRoomID));
         updateTakenSeats();
     });
     socket.on('creating-room', function () {
@@ -194,7 +194,7 @@ io.on('connection', function (socket) {
         socket.emit('created-room', currentRoomID);
         // Sending info
         io.emit('roomlist-change', Array.from(rooms.keys()));
-        io.in(currentRoomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
+        io["in"](currentRoomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
         updateTakenSeats();
     });
     socket.on('leaving-room', function () {
@@ -202,11 +202,19 @@ io.on('connection', function (socket) {
         if (roomID === undefined) {
             return;
         }
+        var playerID = rooms.get(roomID).indexOf(socket.id);
+        var seats = currentSeats.get(roomID);
+        if (seats.includes(playerID)) {
+            // Player is in a seat.
+            seats[seats.indexOf(playerID)] = -1;
+            currentSeats.set(roomID, seats);
+            io["in"](roomID).emit('seat-change', seats);
+        }
         // Leaving room.
         socket.leave(roomID);
         rooms.set(roomID, rooms.get(roomID).filter(function (id) { return id !== socket.id; })); // Remove player from room.
-        playerRooms.delete(socket.id);
-        io.in(roomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
+        playerRooms["delete"](socket.id);
+        io["in"](roomID).emit('player-change', rooms.get(currentRoomID).map(function (id) { return nicknames.get(id); }));
         updateTakenSeats();
     });
     socket.on('choose-seat', function (seat) {
@@ -219,7 +227,7 @@ io.on('connection', function (socket) {
         }
         seats[seat] = playerID;
         currentSeats.set(roomID, seats);
-        io.in(roomID).emit('seat-change', seats);
+        io["in"](roomID).emit('seat-change', seats);
     });
     socket.on('leave-seat', function () {
         var roomID = playerRooms.get(socket.id);
@@ -231,7 +239,7 @@ io.on('connection', function (socket) {
         }
         seats[seats.indexOf(playerID)] = -1;
         currentSeats.set(roomID, seats);
-        io.in(roomID).emit('seat-change', seats);
+        io["in"](roomID).emit('seat-change', seats);
     });
     socket.on('start-game', function () {
         var roomID = playerRooms.get(socket.id);
@@ -248,8 +256,8 @@ io.on('connection', function (socket) {
         var orderedPlayers = [players[seats[0]], players[seats[1]], players[seats[2]], players[seats[3]]];
         console.log(orderedPlayers);
         rooms.set(roomID, orderedPlayers);
-        io.in(roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
-        io.in(roomID).emit('hand-update', currentHands.get(roomID));
+        io["in"](roomID).emit('started-game', rooms.get(roomID).map(function (id) { return nicknames.get(id); }));
+        io["in"](roomID).emit('hand-update', currentHands.get(roomID));
     });
     socket.on('play-card', function (played) {
         // TODO - check for valid card and turn order
@@ -258,7 +266,7 @@ io.on('connection', function (socket) {
         var roomID = playerRooms.get(socket.id);
         currentTricks.get(roomID).push(card);
         var currentSuit = currentTricks.get(roomID)[0].suit;
-        io.in(roomID).emit('card-played', card, currentSuit, player);
+        io["in"](roomID).emit('card-played', card, currentSuit, player);
         showDummy.set(roomID, true); // Dummy will be shown after the first card is played.
         // Update hands
         var hands = currentHands.get(roomID);
@@ -287,13 +295,13 @@ io.on('connection', function (socket) {
             results.set(roomID, newScore);
             currentTricks.set(roomID, []);
             currentTurns.set(roomID, winnerIndex);
-            io.in(roomID).emit('trick-over', results.get(roomID), { cards: thisTrick, winner: winnerIndex });
-            io.in(roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
+            io["in"](roomID).emit('trick-over', results.get(roomID), { cards: thisTrick, winner: winnerIndex });
+            io["in"](roomID).emit('set-turn', winnerIndex); // Sending info about trick winner.
             return;
         }
         var currentTurn = (currentTurns.get(roomID) + 1) % 4;
         currentTurns.set(roomID, currentTurn);
-        io.in(roomID).emit('set-turn', currentTurn);
+        io["in"](roomID).emit('set-turn', currentTurn);
     });
     socket.on('bid', function (bid) {
         // TODO - doubles/redoubles
@@ -309,11 +317,11 @@ io.on('connection', function (socket) {
             var declarer = (0, server_utils_1.findDeclarer)(biddingHistory.get(roomID));
             currentDummy.set(roomID, (declarer + 2) % 4);
             currentTurns.set(roomID, (declarer + 1) % 4); // Next player after declarer starts.
-            io.in(roomID).emit('set-turn', currentTurns.get(roomID));
-            io.in(roomID).emit('bidding-over');
+            io["in"](roomID).emit('set-turn', currentTurns.get(roomID));
+            io["in"](roomID).emit('bidding-over');
             return;
         }
-        io.in(roomID).emit('bid-made', bid);
+        io["in"](roomID).emit('bid-made', bid);
     });
     socket.on('get-hands', function () {
         sendCards(socket);
