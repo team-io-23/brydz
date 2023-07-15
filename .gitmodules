@@ -1,0 +1,6 @@
+[submodule "client"]
+	path = client
+	url = https://github.com/team-io-23/client
+[submodule "server"]
+	path = server
+	url = https://github.com/team-io-23/server
