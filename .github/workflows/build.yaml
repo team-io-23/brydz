@@ -21,4 +21,4 @@ jobs:
          CI: "" # ignores warnings
       run: npm run build --prefix client
     - name: Test with Selenium
-      run: ./tests/run_tests.sh
+      run: ./tests/selenium/run_tests.sh
