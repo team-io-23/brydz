@@ -20,6 +20,8 @@ jobs:
       env:
          CI: "" # ignores warnings
       run: npm run build --prefix client
+    - name: Run client
+      run: npm start --prefix client
     - name: Install Selenium
       run: pip install Selenium
     - name: Test with Selenium
