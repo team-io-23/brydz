@@ -14,7 +14,7 @@ It was created in 2023 as a project for the "Software Engineering" course at the
 
 ## Installation
 
-To install and run on the machine, do the following:
+To install and run on your local or remote machine, do the following in the root directory:
 * checkout the repo with submodules
 ```console
 git clone ...
@@ -24,11 +24,11 @@ git submodule update
 * install npm
 ```console
 cd client
-npm install
+npm install --prefix client
 ```
 * start the server
 ```console
-npm start
+npm start --prefix client
 ```
 
 ## Usage
