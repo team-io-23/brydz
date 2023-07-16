@@ -3,13 +3,16 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver import FirefoxOptions
 
 # Start game alone test
 
 seats = ["south", "west", "north", "east"]
 
 def join_game(name, seatNr):
-    driver = webdriver.Firefox()
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    driver = webdriver.Firefox(options=opts)
     
     driver.get("http://localhost:3000")
     WebDriverWait(driver,10).until(EC.presence_of_element_located((By.ID, ":r1:"))).send_keys(name)
