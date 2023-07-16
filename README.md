@@ -1,4 +1,5 @@
 # Brydż Documentation
+
 ## Table of Contents
 - [Brydż Documentation](#brydż-documentation)
   - [Table of Contents](#table-of-contents)
@@ -10,6 +11,25 @@
 Brydż is a simple bridge bidding system. It is designed to be easy to use while still being powerful enough to be used in a competitive environment.
 
 It was created in 2023 as a project for the "Software Engineering" course at the University of Warsaw.
+
+## Installation
+
+To install and run on the machine, do the following:
+* checkout the repo with submodules
+```console
+git clone ...
+git submodule init
+git submodule update
+```
+* install npm
+```console
+cd client
+npm install
+```
+* start the server
+```console
+npm start
+```
 
 ## Usage
 1. Join screen
