@@ -9,10 +9,13 @@ from selenium.webdriver import FirefoxOptions
 
 seats = ["south", "west", "north", "east"]
 
-def join_game(name, seatNr):
+def create_driver():
     opts = FirefoxOptions()
     opts.add_argument("--headless")
-    driver = webdriver.Firefox(options=opts)
+    return webdriver.Firefox(options=opts)
+
+def join_game(name, seatNr):
+    driver = create_driver()
     
     driver.get("http://localhost:3000")
     WebDriverWait(driver,10).until(EC.presence_of_element_located((By.ID, ":r1:"))).send_keys(name)
