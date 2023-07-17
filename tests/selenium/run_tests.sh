@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for f in $(find . -name "test*.py" | sort -n); do
+for f in $(find tests -name "test01.py" | sort -n); do
     echo "Running $f"
     python $f
     

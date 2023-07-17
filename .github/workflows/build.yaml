@@ -20,3 +20,17 @@ jobs:
       env:
          CI: "" # ignores warnings
       run: npm run build --prefix client
+    - name: Run with npm
+      run: npm run start --prefix client & # in background
+    - name: Set up Python dependencies for tests
+      uses: actions/setup-python@v4 # installs from requirements
+      with:
+        python-version: '3.9'
+        cache: 'pip' # caching pip dependencies
+    - run: |
+        pip install -r requirements.txt
+        pip list show
+    - name: Run Selenium tests
+      run: | # install firefox and use it in tests
+        sudo apt-get install firefox 
+        tests/selenium/run_tests.sh
