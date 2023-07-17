@@ -30,7 +30,6 @@ git submodule update
 ```
 * install npm
 ```console
-cd client
 npm install --prefix client
 ```
 * start the server
