@@ -4,6 +4,7 @@
 - [Brydż Documentation](#brydż-documentation)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+  - [Installation](#installation)
   - [Usage](#usage)
   - [Contributing](#contributing)
 
