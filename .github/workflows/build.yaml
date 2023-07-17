@@ -27,6 +27,7 @@ jobs:
       with:
         python-version: '3.9'
         cache: 'pip' # caching pip dependencies
-      run: |
-        pip list show 
-      #tests/selenium/run_tests.sh
+    - run: pip install -r requirements.txt
+    - run: pip list show 
+        # sudo apt-get install firefox-geckodriver
+        #tests/selenium/run_tests.sh
