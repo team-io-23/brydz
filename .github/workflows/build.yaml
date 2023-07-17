@@ -31,6 +31,6 @@ jobs:
         pip install -r requirements.txt
         pip list show
     - name: Run Selenium tests
-      run: |
-        sudo apt-get install firefox-geckodriver # firefox
+      run: | # install firefox and use it in tests
+        sudo apt-get install firefox-geckodriver 
         tests/selenium/run_tests.sh
