@@ -23,4 +23,10 @@ jobs:
     - name: Run with npm
       run: npm run start --prefix client &
     - name: Run Selenium tests
-      run: python tests/selenium/test01.py
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip' # caching pip dependencies
+    - run: |
+        pip install selenium
+        python tests/selenium/test01.py
