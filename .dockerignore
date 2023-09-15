@@ -1,0 +1,6 @@
+server/node_modules
+client/node_modules
+tests
+.dockerignore
+Dockerfile
+Documentation
