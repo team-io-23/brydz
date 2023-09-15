@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for f in /test/*.py; do
+for f in /tests/*.py; do
     echo "Running $f"
     python $f
     
